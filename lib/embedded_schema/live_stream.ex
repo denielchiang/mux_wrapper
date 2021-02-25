@@ -6,6 +6,7 @@ defmodule MuxWrapper.EmbeddedSchema.LiveStream do
   import Ecto.Changeset
 
   alias MuxWrapper.EmbeddedSchema.Playback
+  alias MuxWrapper.Type.UnixEpoch
 
   @primary_key false
   embedded_schema do
@@ -15,7 +16,8 @@ defmodule MuxWrapper.EmbeddedSchema.LiveStream do
     field(:reconnect_window, :integer)
     field(:status, :string)
     field(:stream_key, :string)
-    field(:created_at, :date)
+    # The time at which the event was created. Time value is represented in ISO 8601 format.
+    field(:created_at, UnixEpoch)
   end
 
   @all_fields ~w(id new_asset_settings reconnect_window status stream_key created_at)a
