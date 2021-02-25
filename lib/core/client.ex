@@ -54,6 +54,13 @@ defmodule MuxWrapper do
     status
   end
 
+  def list_all_live_stream(client) do
+    {:ok, live_streams, _env} = Mux.Video.LiveStreams.list(client)
+
+    live_streams
+    |> (&cast(&1, %LiveStream{})).()
+  end
+
   def create_playback_id(client, live_stream_id, :public) do
     # Anyone with the playback URL can stream the asset
     {:ok, playback_id, _env} =
