@@ -116,6 +116,9 @@ defmodule MuxWrapper do
     |> (&cast(&1, %LiveStream{})).()
   end
 
+  defp cast(list, %LiveStream{} = struct) when is_list(list),
+    do: Enum.map(list, &cast(&1, struct))
+
   defp cast(map, %LiveStream{} = struct), do: LiveStream.cast(struct, map)
   defp cast(map, %Playback{} = struct), do: Playback.cast(struct, map)
   defp cast(map, %Simulcast{} = struct), do: Simulcast.cast(struct, map)
