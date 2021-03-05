@@ -24,8 +24,7 @@ defmodule MuxWrapper.MixProject do
   defp package do
     [
       name: "mux_wrapper",
-      files: ~w(lib priv .formatter.exs mix.exs README* readme* LICENSE*
-                license* CHANGELOG* changelog* src),
+      files: ~w(lib .formatter.exs mix.exs README* LICENSE*),
       maintainers: [" Deniel "],
       licenses: ["MIT"],
       links: %{"GitHub" => "https://github.com/denielchiang/mux_wrapper"}
@@ -44,6 +43,7 @@ defmodule MuxWrapper.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
+      
       # Database
       {:ecto, "~> 3.5"},
 
