@@ -43,12 +43,11 @@ defmodule MuxWrapper.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      
       # Database
       {:ecto, "~> 3.5"},
 
       # Doc
-      {:ex_doc, "~> 0.23", only: :dev, runtime: false},
+      {:ex_doc, "~> 0.24", only: :dev, runtime: false},
 
       # Mux
       {:mux, "~> 1.9.0"}

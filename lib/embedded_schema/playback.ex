@@ -5,6 +5,11 @@ defmodule MuxWrapper.EmbeddedSchema.Playback do
 
   import Ecto.Changeset
 
+  @policy_options %{
+    public: :public,
+    signed: :signed
+  }
+
   @primary_key false
   embedded_schema do
     field(:id, :string)
@@ -22,4 +27,7 @@ defmodule MuxWrapper.EmbeddedSchema.Playback do
     |> cast(params, @all_fields)
     |> apply_changes
   end
+
+  def policy_public, do: @policy_options.public
+  def policy_private, do: @policy_options.signed
 end
