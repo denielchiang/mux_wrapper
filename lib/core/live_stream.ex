@@ -1,9 +1,11 @@
-defmodule MuxWrapper do
+defmodule MuxWrapper.LiveStream do
   @moduledoc """
-  Provides a wrapper core to manipulate Mux API
+  Provides a wrapper of live streaming to manipulate Mux API
   """
+  require Logger
 
-  alias MuxWrapper.EmbeddedSchema.{LiveStream, Playback, Simulcast}
+  alias MuxWrapper.Casting
+  alias MuxWrapper.EmbeddedSchema.{Asset, LiveStream, Simulcast}
 
   @doc """
   Provide a client via authentication
@@ -49,6 +51,8 @@ defmodule MuxWrapper do
     new_asset_settings: %{playback_policy: "public"}
   }
 
+  # Live Stream
+
   @doc """
   Provide a function to send a create a live streming to Mux
 
@@ -81,7 +85,7 @@ defmodule MuxWrapper do
     {:ok, live_stream, _teslaenv} = Mux.Video.LiveStreams.create(client, @playback_policy)
 
     live_stream
-    |> (&cast(&1, %LiveStream{})).()
+    |> (&Casting.cast(&1, %LiveStream{})).()
   end
 
   @doc """
@@ -117,7 +121,7 @@ defmodule MuxWrapper do
     {:ok, live_stream, _env} = Mux.Video.LiveStreams.get(client, live_stream_id)
 
     live_stream
-    |> (&cast(&1, %LiveStream{})).()
+    |> (&Casting.cast(&1, %LiveStream{})).()
   end
 
   @doc """
@@ -157,9 +161,14 @@ defmodule MuxWrapper do
   """
   @spec enable_live_stream(%Tesla.Client{}, String.t()) :: atom()
   def enable_live_stream(client, live_stream_id) do
-    {status, _, _env} = Mux.Video.LiveStreams.enable(client, live_stream_id)
+    with {:ok, _, _env} <- Mux.Video.LiveStreams.enable(client, live_stream_id) do
+      :ok
+    else
+      {:error, msg, env} ->
+        Logger.error("Mux pass in msg: " <> inspect(msg <> ": " <> List.first(env)))
 
-    status
+        :error
+    end
   end
 
   @doc """
@@ -255,12 +264,12 @@ defmodule MuxWrapper do
 
       
   """
-  @spec list_all_live_stream(%Tesla.Client{}) :: %MuxWrapper.EmbeddedSchema.LiveStream{}
-  def list_all_live_stream(client, opt \\ []) do
+  @spec list_all_live_stream(%Tesla.Client{}, Enum.t()) :: %MuxWrapper.EmbeddedSchema.LiveStream{}
+  def list_all_live_stream(client, opt \\ %{}) do
     {:ok, live_streams, _env} = Mux.Video.LiveStreams.list(client, opt)
 
     live_streams
-    |> (&cast(&1, %LiveStream{})).()
+    |> (&Casting.cast(&1, %LiveStream{})).()
   end
 
   @doc """
@@ -304,7 +313,7 @@ defmodule MuxWrapper do
   def create_playback_id(client, live_stream_id, policy_option) do
     policy_option
     |> create_playback(client, live_stream_id)
-    |> cast_playback
+    |> Casting.cast_playback()
   end
 
   defp create_playback(:public, client, live_stream_id) do
@@ -401,7 +410,7 @@ defmodule MuxWrapper do
       Mux.Video.LiveStreams.create_simulcast_target(client, live_stream_id, params)
 
     simulcast_target
-    |> (&cast(&1, %Simulcast{})).()
+    |> (&Casting.cast(&1, %Simulcast{})).()
   end
 
   @doc """
@@ -450,7 +459,7 @@ defmodule MuxWrapper do
       Mux.Video.LiveStreams.get_simulcast_target(client, live_stream_id, simulcast_target_id)
 
     simulcast_target
-    |> (&cast(&1, %Simulcast{})).()
+    |> (&Casting.cast(&1, %Simulcast{})).()
   end
 
   @doc """
@@ -526,14 +535,15 @@ defmodule MuxWrapper do
     {:ok, live_stream, _env} = Mux.Video.LiveStreams.reset_stream_key(client, live_stream_id)
 
     live_stream
-    |> (&cast(&1, %LiveStream{})).()
+    |> (&Casting.cast(&1, %LiveStream{})).()
   end
 
-  defp cast(list, %LiveStream{} = struct) when is_list(list),
-    do: Enum.map(list, &cast(&1, struct))
+  # Assets
+  @spec create_asset(%Tesla.Client{}, Enum.t()) :: %MuxWrapper.EmbeddedSchema.Asset{}
+  def create_asset(client, params) do
+    {:ok, asset, _env} = Mux.Video.Assets.create(client, params)
 
-  defp cast(map, %LiveStream{} = struct), do: LiveStream.cast(struct, map)
-  defp cast(map, %Playback{} = struct), do: Playback.cast(struct, map)
-  defp cast(map, %Simulcast{} = struct), do: Simulcast.cast(struct, map)
-  defp cast_playback(playback_id), do: playback_id |> (&cast(&1, %Playback{})).()
+    asset
+    |> (&Casting.cast(&1, %Asset{})).()
+  end
 end

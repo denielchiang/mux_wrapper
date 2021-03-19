@@ -1,4 +1,5 @@
 defmodule MuxWrapper.Type.UnixEpoch do
+  @moduledoc false
   use Ecto.Type
 
   def type, do: :naive_datetime

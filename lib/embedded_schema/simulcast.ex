@@ -1,10 +1,5 @@
 defmodule MuxWrapper.EmbeddedSchema.Simulcast do
-  @moduledoc """
-  %Simulcast{} struct
-  Create a simulcast target for the parent live stream. 
-  Simulcast target can only be created when the parent live stream is in idle state. 
-  Only one simulcast target can be created at a time with this API.
-  """
+  @moduledoc "Simulcast struct"
 
   use Ecto.Schema
 
@@ -18,12 +13,14 @@ defmodule MuxWrapper.EmbeddedSchema.Simulcast do
     field(:passthrough, :string)
   end
 
+  @doc false
   @all_fields ~w(id url stream_key passthrough)a
   def changeset(%__MODULE__{} = struct, params) do
     struct
     |> cast(params, @all_fields)
   end
 
+  @doc false
   def cast(%__MODULE__{} = struct, params \\ %{}) do
     struct
     |> cast(params, @all_fields)
