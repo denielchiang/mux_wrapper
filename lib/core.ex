@@ -58,5 +58,5 @@ defmodule MuxWrapper do
 
   @doc false
   def print_errors(reason, details),
-    do: Logger.error("Mux pass in msg: " <> inspect(reason <> ": " <> details))
+    do: Logger.error("Mux pass in msg: " <> inspect(reason <> ": " <> List.first(details)))
 end
