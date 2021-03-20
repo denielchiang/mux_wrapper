@@ -46,6 +46,7 @@ defmodule MuxWrapper.Assets do
         status: "preparing"
       }
 
+
   """
   @spec create_asset(%Tesla.Client{}, Enum.t()) :: %MuxWrapper.EmbeddedSchema.Asset{}
   def create_asset(client, params) do
@@ -172,6 +173,7 @@ defmodule MuxWrapper.Assets do
         ]
       }
 
+
   """
   @spec get_asset(%Tesla.Client{}, String.t()) :: %MuxWrapper.EmbeddedSchema.Asset{}
   def get_asset(client, asset_id) do
@@ -294,6 +296,8 @@ defmodule MuxWrapper.Assets do
             }
           }
         ] 
+       
+
   """
   @spec get_asset_input_info(%Tesla.Client{}, String.t()) :: Enum.t()
   def get_asset_input_info(client, asset_id) do
@@ -388,11 +392,110 @@ defmodule MuxWrapper.Assets do
           ]
         }
       ]  
+      
+
   """
   @spec list_assets(%Tesla.Client{}, Enum.t()) :: Enum.t()
   def list_assets(client, opt \\ %{}) do
     with {:ok, assets, _env} <- Mux.Video.Assets.list(client, opt) do
       assets
+      |> (&MuxWrapper.cast(&1, %Asset{})).()
+    else
+      {:error, reason, details} ->
+        MuxWrapper.print_errors(reason, details)
+
+        :error
+    end
+  end
+
+  @doc """
+  Provide a high qulity link to download from Mux, suggest read [Mux doc](https://docs.mux.com/api-reference/video#operation/update-asset-master-access) first
+
+
+  ## Parameters
+
+  - client - provid by `MuxWrapper.client/0`
+  - asset_id - asset id
+
+  ## Examples
+
+
+      iex> client = MuxWrapper.client()
+      %Tesla.Client{
+        adapter: nil,
+        fun: nil,
+        post: [],
+        pre: [
+          {Tesla.Middleware.BaseUrl, :call, ["https://api.mux.com"]},
+          {Tesla.Middleware.BasicAuth, :call,
+           [
+             %{
+               password: "your_password",
+               username: "your_username"
+             }
+           ]}
+        ]
+      }
+
+      iex> MuxWrapper.Assets.update_master_access(client, "CO2pRYhPHeLzmv5MnmuRLmUSEYy4TvHj6gKcoU2kM7A")
+      %MuxWrapper.EmbeddedSchema.Asset{
+        aspect_ratio: "16:9",
+        created_at: ~N[2021-03-20 12:43:16],
+        duration: 10,
+        id: "CO2pRYhPHeLzmv5MnmuRLmUSEYy4TvHj6gKcoU2kM7A",
+        master_access: "temporary",
+        max_stored_frame_rate: 23.962,
+        max_stored_resolution: "SD",
+        mp4_support: "none",
+        playback_ids: [],
+        status: "ready",
+        test: true,
+        tracks: [
+          %MuxWrapper.EmbeddedSchema.Track{
+            channels: nil,
+            duration: 60.095011,
+            encoding: nil,
+            frame_rate: nil,
+            height: nil,
+            id: "kRW00Gn2NfljlA5KBPo01gTf7mijCWvVN801Nh02NTRbTZY",
+            max_channel_layout: "stereo",
+            max_channels: 2,
+            max_frame_rate: nil,
+            max_height: nil,
+            max_width: nil,
+            sample_rate: nil,
+            type: "audio",
+            width: nil
+          },
+          %MuxWrapper.EmbeddedSchema.Track{
+            channels: nil,
+            duration: 60.095,
+            encoding: nil,
+            frame_rate: nil,
+            height: nil,
+            id: "Wo6cajmOIRCygGv85fTTVXX29GYSlhUyQVUJA4h41mU",
+            max_channel_layout: nil,
+            max_channels: nil,
+            max_frame_rate: 23.962,
+            max_height: 360,
+            max_width: 640,
+            sample_rate: nil,
+            type: "video",
+            width: nil
+          }
+        ]
+      }
+
+
+  """
+  @master_access %{
+    master_access: "temporary"
+  }
+  @spec update_master_access(%Tesla.Client{}, String.t()) :: %MuxWrapper.EmbeddedSchema.Asset{}
+  def update_master_access(client, asset_id) do
+    with {:ok, asset, _env} <-
+           Mux.Video.Assets.update_master_access(client, asset_id, @master_access) do
+      asset
       |> (&MuxWrapper.cast(&1, %Asset{})).()
     else
       {:error, reason, details} ->
