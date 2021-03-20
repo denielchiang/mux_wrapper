@@ -44,6 +44,7 @@ defmodule MuxWrapper do
         Application.get_env(:mux, :access_token_secret)
       )
 
+  @doc false
   def cast(list, %LiveStream{} = struct) when is_list(list) do
     live_streams =
       list
