@@ -20,6 +20,9 @@ defmodule MuxWrapper.EmbeddedSchema.AssetInfo do
     |> cast(params, @all_fields)
   end
 
+  def cast(%__MODULE__{} = struct, params) when is_map(params) and params == %{},
+    do: cast(struct, %{})
+
   def cast(%__MODULE__{} = struct, params) when is_list(params) do
     params
     |> Enum.map(&cast(struct, &1))

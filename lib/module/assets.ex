@@ -215,7 +215,7 @@ defmodule MuxWrapper.Assets do
         ]
       }
 
-      iex(4)> MuxWrapper.Assets.get_asset_input_info(client, "doS01p7VusXkwqfhe18LDttqIXV4xqXvd53K8ORee501k")
+      iex> MuxWrapper.Assets.get_asset_input_info(client, "doS01p7VusXkwqfhe18LDttqIXV4xqXvd53K8ORee501k")
         [
           %MuxWrapper.EmbeddedSchema.AssetInfo{
             file: %MuxWrapper.EmbeddedSchema.File{
@@ -300,6 +300,100 @@ defmodule MuxWrapper.Assets do
     with {:ok, input_info, _env} <- Mux.Video.Assets.input_info(client, asset_id) do
       input_info
       |> (&MuxWrapper.cast(&1, %AssetInfo{})).()
+    else
+      {:error, reason, details} ->
+        MuxWrapper.print_errors(reason, details)
+
+        :error
+    end
+  end
+
+  @doc """
+  Provide list assets from Mux, suggest read [Mux doc](https://docs.mux.com/api-reference/video#operation/list-assets) first
+
+
+  ## Parameters
+
+  - client - provid by `MuxWrapper.client/0`
+  - opt: pagnation query params, can pass a Map like this `%{limit: 10, page: 3}`. If don't pass, the default value from Mux is limit: 25 and page: 1
+
+
+  ## Examples
+
+
+      iex> client = MuxWrapper.client()
+      %Tesla.Client{
+        adapter: nil,
+        fun: nil,
+        post: [],
+        pre: [
+          {Tesla.Middleware.BaseUrl, :call, ["https://api.mux.com"]},
+          {Tesla.Middleware.BasicAuth, :call,
+           [
+             %{
+               password: "your_password",
+               username: "your_username"
+             }
+           ]}
+        ]
+      }
+
+      iex> MuxWrapper.Assets.list_assets(client, %{limit: 1, page: 1})
+      [
+        %MuxWrapper.EmbeddedSchema.Asset{
+          aspect_ratio: "16:9",
+          created_at: ~N[2021-03-19 14:37:50],
+          duration: 10,
+          id: "doS01p7VusXkwqfhe18LDttqIXV4xqXvd53K8ORee501k",
+          master_access: "none",
+          max_stored_frame_rate: 23.962,
+          max_stored_resolution: "SD",
+          mp4_support: "none",
+          playback_ids: [],
+          status: "ready",
+          test: true,
+          tracks: [
+            %MuxWrapper.EmbeddedSchema.Track{
+              channels: nil,
+              duration: 60.095011,
+              encoding: nil,
+              frame_rate: nil,
+              height: nil,
+              id: "J00OusXFvcz9UJo93Vd5bFs1EsXX9cd1HqLs6lPWrRSA",
+              max_channel_layout: "stereo",
+              max_channels: 2,
+              max_frame_rate: nil,
+              max_height: nil,
+              max_width: nil,
+              sample_rate: nil,
+              type: "audio",
+              width: nil
+            },
+            %MuxWrapper.EmbeddedSchema.Track{
+              channels: nil,
+              duration: 60.095,
+              encoding: nil,
+              frame_rate: nil,
+              height: nil,
+              id: "2xI4b59vNk02DZ01EmtGk2bOYSb1vY4lmtmb6luBW500Tw",
+              max_channel_layout: nil,
+              max_channels: nil,
+              max_frame_rate: 23.962,
+              max_height: 360,
+              max_width: 640,
+              sample_rate: nil,
+              type: "video",
+              width: nil
+            }
+          ]
+        }
+      ]  
+  """
+  @spec list_assets(%Tesla.Client{}, Enum.t()) :: Enum.t()
+  def list_assets(client, opt \\ %{}) do
+    with {:ok, assets, _env} <- Mux.Video.Assets.list(client, opt) do
+      assets
+      |> (&MuxWrapper.cast(&1, %Asset{})).()
     else
       {:error, reason, details} ->
         MuxWrapper.print_errors(reason, details)

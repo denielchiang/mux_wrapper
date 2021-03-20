@@ -34,7 +34,15 @@ defmodule MuxWrapper.EmbeddedSchema.Asset do
     |> cast_embed(:playback_ids, with: &Playback.changeset/2)
   end
 
-  def cast(%__MODULE__{} = struct, params \\ %{}) do
+  def cast(%__MODULE__{} = struct, params) when is_map(params) and params == %{},
+    do: cast(struct, %{})
+
+  def cast(%__MODULE__{} = struct, params) when is_list(params) do
+    params
+    |> Enum.map(&cast(struct, &1))
+  end
+
+  def cast(%__MODULE__{} = struct, params) do
     struct
     |> cast(params, @all_fields)
     |> cast_embed(:tracks, with: &Track.changeset/2)

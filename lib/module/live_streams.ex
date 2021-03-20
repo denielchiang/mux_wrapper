@@ -257,7 +257,7 @@ defmodule MuxWrapper.LiveStreams do
 
       
   """
-  @spec list_all_live_stream(%Tesla.Client{}, Enum.t()) :: %MuxWrapper.EmbeddedSchema.LiveStream{}
+  @spec list_all_live_stream(%Tesla.Client{}, Enum.t()) :: Enum.t()
   def list_all_live_stream(client, opt \\ %{}) do
     with {:ok, live_streams, _env} <- Mux.Video.LiveStreams.list(client, opt) do
       live_streams
