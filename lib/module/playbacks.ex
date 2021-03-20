@@ -107,4 +107,52 @@ defmodule MuxWrapper.Playbacks do
         |> MuxWrapper.print_errors(details)
     end
   end
+
+  @doc """
+  Delete a playback by asset id and playback id. to Mux, suggest read [Mux doc](https://docs.mux.com/api-reference/video#operation/delete-asset-playback-id) first
+
+
+  ## Parameters
+
+  - client - provid by `MuxWrapper.client/0`
+  - asset_id - asset id
+  - playback_id - playback id
+
+  ## Examples
+
+
+      iex> client = MuxWrapper.client()
+      %Tesla.Client{
+        adapter: nil,
+        fun: nil,
+        post: [],
+        pre: [
+          {Tesla.Middleware.BaseUrl, :call, ["https://api.mux.com"]},
+          {Tesla.Middleware.BasicAuth, :call,
+           [
+             %{
+               password: "your_password",
+               username: "your_username"
+             }
+           ]}
+        ]
+      }
+
+      iex> MuxWrapper.Playbacks.delete(client, "CO2pRYhPHeLzmv5MnmuRLmUSEYy4TvHj6gKcoU2kM7A", "UdNWaprxjIA01BUYYDJpaCiDZQu22Ep6tAJLOLA8Sk7A")
+      {:ok}
+      
+      iex> MuxWrapper.Playbacks.delete(client, "CO2pRYhPHeLzmv5MnmuRLmUSEYy4TvHj6gKcoU2kM7A", "UdNWaprxjIA01BUYYDJpaCiDZQu22Ep6tAJLOLA8Sk7A")
+      03:09:29.925 [error] Mux pass in msg: "not_found: Playback ID not found"
+      {:error} 
+  """
+  @spec delete(%Tesla.Client{}, String.t(), String.t()) :: tuple()
+  def delete(client, asset_id, playback_id) do
+    with {:ok, "", _env} <- Mux.Video.PlaybackIds.delete(client, asset_id, playback_id) do
+      MuxWrapper.success()
+    else
+      {:error, reason, details} ->
+        reason
+        |> MuxWrapper.print_errors(details)
+    end
+  end
 end

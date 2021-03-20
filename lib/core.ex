@@ -64,4 +64,7 @@ defmodule MuxWrapper do
 
     {:error}
   end
+
+  @doc false
+  def success, do: {:ok}
 end
