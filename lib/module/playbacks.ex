@@ -155,4 +155,59 @@ defmodule MuxWrapper.Playbacks do
         |> MuxWrapper.print_errors(details)
     end
   end
+
+  @doc """
+  Get a playback by asset id and playback id. to Mux, suggest read [Mux doc](https://docs.mux.com/api-reference/video#operation/delete-asset-playback-id) first
+
+
+  ## Parameters
+
+  - client - provid by `MuxWrapper.client/0`
+  - asset_id - asset id
+  - playback_id - playback id
+
+  ## Examples
+
+
+      iex> client = MuxWrapper.client()
+      %Tesla.Client{
+        adapter: nil,
+        fun: nil,
+        post: [],
+        pre: [
+          {Tesla.Middleware.BaseUrl, :call, ["https://api.mux.com"]},
+          {Tesla.Middleware.BasicAuth, :call,
+           [
+             %{
+               password: "your_password",
+               username: "your_username"
+             }
+           ]}
+        ]
+      }
+
+      iex> MuxWrapper.Playbacks.get(client, "CO2pRYhPHeLzmv5MnmuRLmUSEYy4TvHj6gKcoU2kM7A", "CO2pRYhPHeLzmv5MnmuRLmUSEYy4TvHj6gKcoU2kM7A")
+      03:23:06.784 [error] Mux pass in msg: "invalid_parameters: Invalid playback id, mismatching environment"
+      {:error}
+
+      iex> MuxWrapper.Playbacks.get(client, "CO2pRYhPHeLzmv5MnmuRLmUSEYy4TvHj6gKcoU2kM7A", "yP29YfRnmqr6Ft47nd9FscOTq5Eo63UWB74TJSeo9Es")
+      {:ok,
+       %MuxWrapper.EmbeddedSchema.Playback{
+         id: "yP29YfRnmqr6Ft47nd9FscOTq5Eo63UWB74TJSeo9Es",
+         policy: "signed"
+       }}
+
+
+  """
+  @spec get(%Tesla.Client{}, String.t(), String.t()) :: tuple()
+  def get(client, asset_id, playback_id) do
+    with {:ok, playback_id, _env} <- Mux.Video.PlaybackIds.get(client, asset_id, playback_id) do
+      playback_id
+      |> (&MuxWrapper.cast(&1, %Playback{})).()
+    else
+      {:error, reason, details} ->
+        reason
+        |> MuxWrapper.print_errors(details)
+    end
+  end
 end
