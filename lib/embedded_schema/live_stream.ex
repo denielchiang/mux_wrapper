@@ -1,5 +1,5 @@
 defmodule MuxWrapper.EmbeddedSchema.LiveStream do
-  @moduledoc "LiveStream struct"
+  @moduledoc false
 
   use Ecto.Schema
 

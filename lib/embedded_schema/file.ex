@@ -1,5 +1,5 @@
 defmodule MuxWrapper.EmbeddedSchema.File do
-  @moduledoc "File struct"
+  @moduledoc false
 
   use Ecto.Schema
 

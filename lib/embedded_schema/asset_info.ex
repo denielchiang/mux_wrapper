@@ -1,5 +1,5 @@
 defmodule MuxWrapper.EmbeddedSchema.AssetInfo do
-  @moduledoc "Asset info struct"
+  @moduledoc false
 
   use Ecto.Schema
 

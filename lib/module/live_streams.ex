@@ -5,9 +5,9 @@ defmodule MuxWrapper.LiveStreams do
 
   alias MuxWrapper.EmbeddedSchema.{LiveStream, Simulcast, Playback}
 
-  @playback_policy %{
-    playback_policy: "public",
-    new_asset_settings: %{playback_policy: "public"}
+  @privacy %{
+    public: "public",
+    private: "signed"
   }
 
   @doc """
@@ -42,7 +42,8 @@ defmodule MuxWrapper.LiveStreams do
   """
   @spec create_live_stream(%Tesla.Client{}) :: tuple()
   def create_live_stream(client) do
-    with {:ok, live_stream, _teslaenv} <- Mux.Video.LiveStreams.create(client, @playback_policy) do
+    with {:ok, live_stream, _teslaenv} <-
+           Mux.Video.LiveStreams.create(client, %{policy: @privacy.public}) do
       live_stream
       |> (&MuxWrapper.cast(&1, %LiveStream{})).()
     else
@@ -269,19 +270,19 @@ defmodule MuxWrapper.LiveStreams do
   end
 
   @doc """
-   Provide a function to create a praivate playback id in Mux
-
-   ## Parameters
-
-   - client: provide by `client/0`
-   - live_stream_id: live stream id
-   - pramas - provide by `MuxWrapper.EmbeddedSchema.Playback.policy_public/0` or `MuxWrapper.EmbeddedSchema.Playback.policy_private/0`
-
-   ## Example
+  Create a `public` new playback ID by asset id. to Mux, suggest read [Mux doc](https://docs.mux.com/api-reference/video#operation/create-asset-playback-id) first
 
 
-       iex> client = MuxWrapper.client()
-       %Tesla.Client{
+  ## Parameters
+
+  - client - provid by `MuxWrapper.client/0`
+  - live_stream_id - live stream id
+
+  ## Examples
+
+
+      iex> client = MuxWrapper.client()
+      %Tesla.Client{
         adapter: nil,
         fun: nil,
         post: [],
@@ -295,46 +296,74 @@ defmodule MuxWrapper.LiveStreams do
              }
            ]}
         ]
-       } 
+      }
 
-       iex> MuxWrapper.LiveStreams.create_playback_id(client, "stream_id_very_long", :signed)
-       {:ok, 
-         %MuxWrapper.EmbeddedSchema.Playback{
-           id: "FRDDXsjcNgD013rx1M4CDunZ86xkq8A02hfF3b6XAa7iE",
-           policy: "singed"
-         }
-       }
+      iex> MuxWrapper.Playbacks.create_public_playback_id(client, "live_stream_id_very_long")
+      {:ok,
+        %MuxWrapper.EmbeddedSchema.Playback{
+          id: "UdNWaprxjIA01BUYYDJpaCiDZQu22Ep6tAJLOLA8Sk7A",
+          policy: "public"
+        }
+      }
+
 
   """
-  @spec create_playback_id(%Tesla.Client{}, String.t(), atom()) :: tuple()
-  def create_playback_id(client, live_stream_id, params) do
-    with {:ok, playback_id} <- create_playback(params, client, live_stream_id) do
+  @spec create_public_playback_id(%Tesla.Client{}, String.t()) :: tuple()
+  def create_public_playback_id(client, live_stream_id),
+    do: create_playback_id(client, live_stream_id, %{policy: @privacy.public})
+
+  @doc """
+  Create a `signed` new playback ID by asset id. to Mux, suggest read [Mux doc](https://docs.mux.com/api-reference/video#operation/create-asset-playback-id) first
+
+
+  ## Parameters
+
+  - client - provid by `MuxWrapper.client/0`
+  - live_stream_id - live stream id
+
+  ## Examples
+
+
+      iex> client = MuxWrapper.client()
+      %Tesla.Client{
+        adapter: nil,
+        fun: nil,
+        post: [],
+        pre: [
+          {Tesla.Middleware.BaseUrl, :call, ["https://api.mux.com"]},
+          {Tesla.Middleware.BasicAuth, :call,
+           [
+             %{
+               password: "your_password",
+               username: "your_username"
+             }
+           ]}
+        ]
+      }
+
+      iex> MuxWrapper.Playbacks.create_private_playback_id(client, "live_stream_id_very_long")
+      {:ok,
+        %MuxWrapper.EmbeddedSchema.Playback{
+          id: "yP29YfRnmqr6Ft47nd9FscOTq5Eo63UWB74TJSeo9Es",
+          policy: "signed"
+        } 
+      }
+
+
+  """
+  @spec create_private_playback_id(%Tesla.Client{}, String.t()) :: tuple()
+  def create_private_playback_id(client, live_stream_id),
+    do: create_playback_id(client, live_stream_id, %{policy: @privacy.private})
+
+  defp create_playback_id(client, live_stream_id, params) do
+    with {:ok, playback_id, _env} <-
+           Mux.Video.LiveStreams.create_playback_id(client, live_stream_id, params) do
       playback_id
       |> (&MuxWrapper.cast(&1, %Playback{})).()
     else
       {:error, reason, details} ->
         reason
         |> MuxWrapper.print_errors(details)
-    end
-  end
-
-  defp create_playback(:public, client, live_stream_id) do
-    with {:ok, playback_id, _env} <-
-           Mux.Video.LiveStreams.create_playback_id(client, live_stream_id, %{policy: "public"}) do
-      {:ok, playback_id}
-    else
-      {:error, reason, details} ->
-        {:error, reason, details}
-    end
-  end
-
-  defp create_playback(:private, client, live_stream_id) do
-    with {:ok, playback_id, _env} <-
-           Mux.Video.LiveStreams.create_playback_id(client, live_stream_id, %{policy: "signed"}) do
-      {:ok, playback_id}
-    else
-      {:error, reason, details} ->
-        {:error, reason, details}
     end
   end
 

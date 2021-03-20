@@ -1,5 +1,5 @@
 defmodule MuxWrapper.EmbeddedSchema.Playback do
-  @moduledoc "Playback{} struct"
+  @moduledoc false
 
   use Ecto.Schema
 
