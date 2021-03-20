@@ -6,15 +6,15 @@ Mux API wrapper, trun API response JSONB to embedded schema.
 
 ### VIDEO API
 #### Assets
-- [ ] Create an asset
-- [ ] Retrieve an asset
-- [ ] Delete an asset
-- [ ] List assets
-- [ ] Retrieve asset input info
-- [ ] Update mp4 support
-- [ ] Update master access
-- [ ] Create a subtitle text track
-- [ ] Delete a subtitle text track
+- [x] Create an asset
+- [x] Retrieve an asset
+- [x] Delete an asset
+- [x] List assets
+- [x] Retrieve asset input info
+- [x] Update mp4 support
+- [x] Update master access
+- [x] Create a subtitle text track
+- [x] Delete a subtitle text track
 
 #### Playback IDs
 - [ ] Create a playback ID
