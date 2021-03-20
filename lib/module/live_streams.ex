@@ -229,20 +229,30 @@ defmodule MuxWrapper.LiveStreams do
        } 
 
        iex> MuxWrapper.LiveStreams.list_all_live_stream(client, %{limit: 1, page: 1})
-       %MuxWrapper.EmbeddedSchema.LiveStream{
-         created_at: ~N[2021-03-16 09:59:26],
-         id: "livestream_id_very_long",
-         new_asset_settings: %{"playback_policies" => ["public"]},
-         playback_ids: [
-           %MuxWrapper.EmbeddedSchema.Playback{
-             id: "playback_id_very_long",
-             policy: "public"
-           }
-         ],
-         reconnect_window: 60,
-         status: "idle",
-         stream_key: "stream_key_very_long"
-       }
+       [
+        %MuxWrapper.EmbeddedSchema.LiveStream{
+          created_at: ~N[2021-03-17 16:49:36],
+          id: "ABYT7nZXRKXLz02rMeWo00bhzLgw34sby6ZcZWR7vboFI",
+          new_asset_settings: %{"playback_policies" => ["public"]},
+          playback_ids: [
+            %MuxWrapper.EmbeddedSchema.Playback{
+              id: "NbUxpgpd02V00g02JNScdJwCxB9LUzPlvUmcnGHadG1V700",
+              policy: "public"
+            },
+            %MuxWrapper.EmbeddedSchema.Playback{
+              id: "Lg2lOeX9dmuzGOZBRVPYhcng9008MPUcCxwWA8002brlw",
+              policy: "signed"
+            },
+            %MuxWrapper.EmbeddedSchema.Playback{
+              id: "cnIcHj02pOmG01aTAE7t2B5iDWjWgQgLUbz8YHkJElBcs",
+              policy: "public"
+            }
+          ],
+          reconnect_window: 60,
+          status: "idle",
+          stream_key: "stream_key_very_long"
+        }
+       ] 
 
 
       
