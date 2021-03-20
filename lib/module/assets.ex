@@ -186,6 +186,116 @@ defmodule MuxWrapper.Assets do
     end
   end
 
+  @doc """
+  Provide get asset info from Mux, suggest read [Mux doc](https://docs.mux.com/api-reference/video#operation/get-asset-input-info) first
+
+
+  ## Parameters
+
+  - client - provid by `MuxWrapper.client/0`
+  - asset_id - asset id
+
+  ## Examples
+
+
+      iex> client = MuxWrapper.client()
+      %Tesla.Client{
+        adapter: nil,
+        fun: nil,
+        post: [],
+        pre: [
+          {Tesla.Middleware.BaseUrl, :call, ["https://api.mux.com"]},
+          {Tesla.Middleware.BasicAuth, :call,
+           [
+             %{
+               password: "your_password",
+               username: "your_username"
+             }
+           ]}
+        ]
+      }
+
+      iex(4)> MuxWrapper.Assets.get_asset_input_info(client, "doS01p7VusXkwqfhe18LDttqIXV4xqXvd53K8ORee501k")
+        [
+          %MuxWrapper.EmbeddedSchema.AssetInfo{
+            file: %MuxWrapper.EmbeddedSchema.File{
+              container_format: "mov,mp4,m4a,3gp,3g2,mj2",
+              tracks: [
+                %MuxWrapper.EmbeddedSchema.Track{
+                  channels: 2,
+                  duration: 60.095011,
+                  encoding: "aac",
+                  frame_rate: nil,
+                  height: nil,
+                  id: nil,
+                  max_channel_layout: nil,
+                  max_channels: nil,
+                  max_frame_rate: nil,
+                  max_height: nil,
+                  max_width: nil,
+                  sample_rate: 22050,
+                  type: "audio",
+                  width: nil
+                },
+                %MuxWrapper.EmbeddedSchema.Track{
+                  channels: nil,
+                  duration: 60.095,
+                  encoding: "h264",
+                  frame_rate: 23.962,
+                  height: 360,
+                  id: nil,
+                  max_channel_layout: nil,
+                  max_channels: nil,
+                  max_frame_rate: nil,
+                  max_height: nil,
+                  max_width: nil,
+                  sample_rate: nil,
+                  type: "video",
+                  width: 640
+                }
+              ]
+            },
+            settings: %MuxWrapper.EmbeddedSchema.Settings{
+              overlay_settings: nil,
+              url: "http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4"
+            }
+          },
+          %MuxWrapper.EmbeddedSchema.AssetInfo{
+            file: %MuxWrapper.EmbeddedSchema.File{
+              container_format: "png",
+              tracks: [
+                %MuxWrapper.EmbeddedSchema.Track{
+                  channels: nil,
+                  duration: nil,
+                  encoding: "png",
+                  frame_rate: nil,
+                  height: 346,
+                  id: nil,
+                  max_channel_layout: nil,
+                  max_channels: nil,
+                  max_frame_rate: nil,
+                  max_height: nil,
+                  max_width: nil,
+                  sample_rate: nil,
+                  type: "image",
+                  width: 642
+                }
+              ]
+            },
+            settings: %MuxWrapper.EmbeddedSchema.Settings{
+              overlay_settings: %MuxWrapper.EmbeddedSchema.OverlaySettings{
+                horizontal_align: "center",
+                opacity: "100.000000%",
+                vertical_align: "bottom",
+                vertical_margin: "100px",
+                width: "640px"
+              },
+              url: "https://storage.googleapis.com/muxdemofiles/mux-test-video-watermark.png"
+            }
+          }
+        ] 
+  """
+  @spec get_asset_input_info(%Tesla.Client{}, String.t()) :: Enum.t()
   def get_asset_input_info(client, asset_id) do
     with {:ok, input_info, _env} <- Mux.Video.Assets.input_info(client, asset_id) do
       input_info
