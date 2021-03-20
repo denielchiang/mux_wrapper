@@ -4,11 +4,6 @@ defmodule MuxWrapper.Playbacks do
   """
   alias MuxWrapper.EmbeddedSchema.Playback
 
-  @typedoc """
-  A playback embedded schema, e.g. id, policy
-  """
-  @type playback :: MuxWrapper.EmbeddedSchema.Playback
-
   @privacy %{
     public: "public",
     private: "signed"
