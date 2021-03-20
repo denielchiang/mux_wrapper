@@ -5,11 +5,6 @@ defmodule MuxWrapper.LiveStreams do
 
   alias MuxWrapper.EmbeddedSchema.{LiveStream, Simulcast, Playback}
 
-  @typedoc """
-  A playback embedded schema, e.g. id, policy
-  """
-  @type playback :: MuxWrapper.EmbeddedSchema.Playback
-
   @playback_policy %{
     playback_policy: "public",
     new_asset_settings: %{playback_policy: "public"}
@@ -26,32 +21,34 @@ defmodule MuxWrapper.LiveStreams do
 
 
       iex> MuxWrapper.client() |> MuxWrapper.LiveStreams.create_live_stream()
-      %MuxWrapper.EmbeddedSchema.LiveStream{
-        created_at: ~N[2021-03-16 09:59:26],
-        id: "livestream_id_very_long",
-        new_asset_settings: %{"playback_policies" => ["public"]},
-        playback_ids: [
-          %MuxWrapper.EmbeddedSchema.Playback{
-            id: "playback_id_very_long",
-            policy: "public"
+      {:ok, 
+        %MuxWrapper.EmbeddedSchema.LiveStream{
+            created_at: ~N[2021-03-16 09:59:26],
+            id: "livestream_id_very_long",
+            new_asset_settings: %{"playback_policies" => ["public"]},
+            playback_ids: [
+              %MuxWrapper.EmbeddedSchema.Playback{
+                id: "playback_id_very_long",
+                policy: "public"
+              }
+            ],
+            reconnect_window: 60,
+            status: "idle",
+            stream_key: "stream_key_very_long"
           }
-        ],
-        reconnect_window: 60,
-        status: "idle",
-        stream_key: "stream_key_very_long"
       }
 
+
   """
-  @spec create_live_stream(%Tesla.Client{}) :: %MuxWrapper.EmbeddedSchema.LiveStream{}
+  @spec create_live_stream(%Tesla.Client{}) :: tuple()
   def create_live_stream(client) do
     with {:ok, live_stream, _teslaenv} <- Mux.Video.LiveStreams.create(client, @playback_policy) do
       live_stream
       |> (&MuxWrapper.cast(&1, %LiveStream{})).()
     else
       {:error, reason, details} ->
-        MuxWrapper.print_errors(reason, details)
-
-        :error
+        reason
+        |> MuxWrapper.print_errors(details)
     end
   end
 
@@ -67,32 +64,33 @@ defmodule MuxWrapper.LiveStreams do
 
 
       iex> MuxWrapper.client() |> MuxWrapper.LiveStreams.get_live_stream("stream_id_very_long")
-      %MuxWrapper.EmbeddedSchema.LiveStream{
-        created_at: ~N[2021-03-16 09:59:26],
-        id: "stream_id_very_long",
-        new_asset_settings: %{"playback_policies" => ["public"]},
-        playback_ids: [
-          %MuxWrapper.EmbeddedSchema.Playback{
-            id: "playback_id_very_long",
-            policy: "public"
-          }
-        ],
-        reconnect_window: 60,
-        status: "idle",
-        stream_key: "stream_key_very_long"
+      {:ok,
+        %MuxWrapper.EmbeddedSchema.LiveStream{
+          created_at: ~N[2021-03-16 09:59:26],
+          id: "stream_id_very_long",
+          new_asset_settings: %{"playback_policies" => ["public"]},
+          playback_ids: [
+            %MuxWrapper.EmbeddedSchema.Playback{
+              id: "playback_id_very_long",
+              policy: "public"
+            }
+          ],
+          reconnect_window: 60,
+          status: "idle",
+          stream_key: "stream_key_very_long"
+        }
       }
 
   """
-  @spec get_live_stream(%Tesla.Client{}, String.t()) :: %MuxWrapper.EmbeddedSchema.LiveStream{}
+  @spec get_live_stream(%Tesla.Client{}, String.t()) :: tuple()
   def get_live_stream(client, live_stream_id) do
     with {:ok, live_stream, _env} <- Mux.Video.LiveStreams.get(client, live_stream_id) do
       live_stream
       |> (&MuxWrapper.cast(&1, %LiveStream{})).()
     else
       {:error, reason, details} ->
-        MuxWrapper.print_errors(reason, details)
-
-        :error
+        reason
+        |> MuxWrapper.print_errors(details)
     end
   end
 
@@ -108,17 +106,16 @@ defmodule MuxWrapper.LiveStreams do
 
 
       iex> MuxWrapper.client |> MuxWrapper.LiveStreams.delete_live_stream("live_stream_id_very_long")
-      :ok
+      {:ok}
   """
-  @spec delete_live_stream(%Tesla.Client{}, String.t()) :: atom()
+  @spec delete_live_stream(%Tesla.Client{}, String.t()) :: tuple()
   def delete_live_stream(client, live_stream_id) do
     with {:ok, _data, _env} <- Mux.Video.LiveStreams.delete(client, live_stream_id) do
-      :ok
+      MuxWrapper.success()
     else
       {:error, reason, details} ->
-        MuxWrapper.print_errors(reason, details)
-
-        :error
+        reason
+        |> MuxWrapper.print_errors(details)
     end
   end
 
@@ -134,17 +131,16 @@ defmodule MuxWrapper.LiveStreams do
 
 
       iex> MuxWrapper.client() |> MuxWrapper.LiveStreams.enable_live_stream("live_stream_id_very_long")
-      :ok
+      {:ok}
   """
-  @spec enable_live_stream(%Tesla.Client{}, String.t()) :: atom()
+  @spec enable_live_stream(%Tesla.Client{}, String.t()) :: tuple()
   def enable_live_stream(client, live_stream_id) do
     with {:ok, _, _env} <- Mux.Video.LiveStreams.enable(client, live_stream_id) do
-      :ok
+      MuxWrapper.success()
     else
       {:error, reason, details} ->
-        MuxWrapper.print_errors(reason, details)
-
-        :error
+        reason
+        |> MuxWrapper.print_errors(details)
     end
   end
 
@@ -160,19 +156,18 @@ defmodule MuxWrapper.LiveStreams do
 
 
       iex> MuxWrapper.client() |> MuxWrapper.LiveStreams.disable_live_stream("live_stream_id_very_long")
-      :ok
+      {:ok}
 
 
   """
-  @spec disable_live_stream(%Tesla.Client{}, String.t()) :: atom()
+  @spec disable_live_stream(%Tesla.Client{}, String.t()) :: tuple()
   def disable_live_stream(client, live_stream_id) do
     with {:ok, _, _env} <- Mux.Video.LiveStreams.disable(client, live_stream_id) do
-      :ok
+      MuxWrapper.success()
     else
       {:error, reason, details} ->
-        MuxWrapper.print_errors(reason, details)
-
-        :error
+        reason
+        |> MuxWrapper.print_errors(details)
     end
   end
 
@@ -188,19 +183,18 @@ defmodule MuxWrapper.LiveStreams do
 
 
       iex> MuxWrapper.client() |> MuxWrapper.LiveStreams.complete_live_stream("live_stream_id_very_long")
-      :ok
+      {:ok}
 
       
   """
-  @spec complete_live_stream(%Tesla.Client{}, String.t()) :: atom()
+  @spec complete_live_stream(%Tesla.Client{}, String.t()) :: tuple()
   def complete_live_stream(client, live_stream_id) do
     with {:ok, _, _env} <- Mux.Video.LiveStreams.signal_complete(client, live_stream_id) do
-      :ok
+      MuxWrapper.success()
     else
       {:error, reason, details} ->
-        MuxWrapper.print_errors(reason, details)
-
-        :error
+        reason
+        |> MuxWrapper.print_errors(details)
     end
   end
 
@@ -233,44 +227,44 @@ defmodule MuxWrapper.LiveStreams do
        } 
 
        iex> MuxWrapper.LiveStreams.list_all_live_stream(client, %{limit: 1, page: 1})
-       [
-        %MuxWrapper.EmbeddedSchema.LiveStream{
-          created_at: ~N[2021-03-17 16:49:36],
-          id: "ABYT7nZXRKXLz02rMeWo00bhzLgw34sby6ZcZWR7vboFI",
-          new_asset_settings: %{"playback_policies" => ["public"]},
-          playback_ids: [
-            %MuxWrapper.EmbeddedSchema.Playback{
-              id: "NbUxpgpd02V00g02JNScdJwCxB9LUzPlvUmcnGHadG1V700",
-              policy: "public"
-            },
-            %MuxWrapper.EmbeddedSchema.Playback{
-              id: "Lg2lOeX9dmuzGOZBRVPYhcng9008MPUcCxwWA8002brlw",
-              policy: "signed"
-            },
-            %MuxWrapper.EmbeddedSchema.Playback{
-              id: "cnIcHj02pOmG01aTAE7t2B5iDWjWgQgLUbz8YHkJElBcs",
-              policy: "public"
-            }
-          ],
-          reconnect_window: 60,
-          status: "idle",
-          stream_key: "stream_key_very_long"
-        }
-       ] 
-
+       {:ok, 
+         [
+          %MuxWrapper.EmbeddedSchema.LiveStream{
+            created_at: ~N[2021-03-17 16:49:36],
+            id: "ABYT7nZXRKXLz02rMeWo00bhzLgw34sby6ZcZWR7vboFI",
+            new_asset_settings: %{"playback_policies" => ["public"]},
+            playback_ids: [
+              %MuxWrapper.EmbeddedSchema.Playback{
+                id: "NbUxpgpd02V00g02JNScdJwCxB9LUzPlvUmcnGHadG1V700",
+                policy: "public"
+              },
+              %MuxWrapper.EmbeddedSchema.Playback{
+                id: "Lg2lOeX9dmuzGOZBRVPYhcng9008MPUcCxwWA8002brlw",
+                policy: "signed"
+              },
+              %MuxWrapper.EmbeddedSchema.Playback{
+                id: "cnIcHj02pOmG01aTAE7t2B5iDWjWgQgLUbz8YHkJElBcs",
+                policy: "public"
+              }
+            ],
+            reconnect_window: 60,
+            status: "idle",
+            stream_key: "stream_key_very_long"
+          }
+         ] 
+       }
 
       
   """
-  @spec list_all_live_stream(%Tesla.Client{}, Enum.t()) :: Enum.t()
+  @spec list_all_live_stream(%Tesla.Client{}, Enum.t()) :: tuple()
   def list_all_live_stream(client, opt \\ %{}) do
     with {:ok, live_streams, _env} <- Mux.Video.LiveStreams.list(client, opt) do
       live_streams
       |> (&MuxWrapper.cast(&1, %LiveStream{})).()
     else
       {:error, reason, details} ->
-        MuxWrapper.print_errors(reason, details)
-
-        :error
+        reason
+        |> MuxWrapper.print_errors(details)
     end
   end
 
@@ -304,22 +298,23 @@ defmodule MuxWrapper.LiveStreams do
        } 
 
        iex> MuxWrapper.LiveStreams.create_playback_id(client, "stream_id_very_long", :signed)
-       %MuxWrapper.EmbeddedSchema.Playback{
-         id: "FRDDXsjcNgD013rx1M4CDunZ86xkq8A02hfF3b6XAa7iE",
-         policy: "singed"
+       {:ok, 
+         %MuxWrapper.EmbeddedSchema.Playback{
+           id: "FRDDXsjcNgD013rx1M4CDunZ86xkq8A02hfF3b6XAa7iE",
+           policy: "singed"
+         }
        }
 
   """
-  @spec create_playback_id(%Tesla.Client{}, String.t(), atom()) :: playback
+  @spec create_playback_id(%Tesla.Client{}, String.t(), atom()) :: tuple()
   def create_playback_id(client, live_stream_id, params) do
     with {:ok, playback_id} <- create_playback(params, client, live_stream_id) do
       playback_id
       |> (&MuxWrapper.cast(&1, %Playback{})).()
     else
       {:error, reason, details} ->
-        MuxWrapper.print_errors(reason, details)
-
-        :error
+        reason
+        |> MuxWrapper.print_errors(details)
     end
   end
 
@@ -373,18 +368,17 @@ defmodule MuxWrapper.LiveStreams do
       } 
 
       iex> MuxWrapper.LiveStreams.delete_playback_id(client, "stream_id_very_long", "playback_id_very_long")
-      :ok
+      {:ok}
   """
-  @spec delete_playback_id(%Tesla.Client{}, String.t(), String.t()) :: atom()
+  @spec delete_playback_id(%Tesla.Client{}, String.t(), String.t()) :: tuple()
   def delete_playback_id(client, live_stream_id, playback_id) do
     with {:ok, _, _env} <-
            Mux.Video.LiveStreams.delete_playback_id(client, live_stream_id, playback_id) do
-      :ok
+      MuxWrapper.success()
     else
       {:error, reason, details} ->
-        MuxWrapper.print_errors(reason, details)
-
-        :error
+        reason
+        |> MuxWrapper.print_errors(details)
     end
   end
 
@@ -409,11 +403,13 @@ defmodule MuxWrapper.LiveStreams do
       }
 
       iex> MuxWrapper.clinet() |> MuxWrapper.LiveStreams.create_simulcast_target("live_stream_id_very_long", params)
-      %MuxWrapper.EmbeddedSchema.Simulcast{
-        id: "vuOfW021mz5QA500wYEQ9SeUYvuYnpFz011mqSvski5T8claN02JN9ve2g",
-        passthrough: "Example 1",
-        stream_key: "abcdefgh",
-        url: "rtmp://live.example1.com/app"
+      {:ok, 
+        %MuxWrapper.EmbeddedSchema.Simulcast{
+          id: "vuOfW021mz5QA500wYEQ9SeUYvuYnpFz011mqSvski5T8claN02JN9ve2g",
+          passthrough: "Example 1",
+          stream_key: "abcdefgh",
+          url: "rtmp://live.example1.com/app"
+        }
       }
 
   """
@@ -421,8 +417,7 @@ defmodule MuxWrapper.LiveStreams do
           %Tesla.Client{},
           String.t(),
           %MuxWrapper.EmbeddedSchema.Simulcast{}
-        ) ::
-          %MuxWrapper.EmbeddedSchema.Simulcast{}
+        ) :: tuple()
   def create_simulcast_target(client, live_stream_id, params) do
     with {:ok, simulcast_target, _env} <-
            Mux.Video.LiveStreams.create_simulcast_target(client, live_stream_id, params) do
@@ -430,9 +425,8 @@ defmodule MuxWrapper.LiveStreams do
       |> (&MuxWrapper.cast(&1, %Simulcast{})).()
     else
       {:error, reason, details} ->
-        MuxWrapper.print_errors(reason, details)
-
-        :error
+        reason
+        |> MuxWrapper.print_errors(details)
     end
   end
 
@@ -466,17 +460,18 @@ defmodule MuxWrapper.LiveStreams do
       } 
 
       iex> MuxWrapper.LiveStreams.get_simulcast_target(client, "stream_id_very_long", "simulcast_target_id")
-       %MuxWrapper.EmbeddedSchema.Simulcast{
-        id: "vuOfW021mz5QA500wYEQ9SeUYvuYnpFz011mqSvski5T8claN02JN9ve2g",
-        passthrough: "Example 1",
-        stream_key: "abcdefgh",
-        url: "rtmp://live.example1.com/app"
+      {:ok, 
+        %MuxWrapper.EmbeddedSchema.Simulcast{
+          id: "vuOfW021mz5QA500wYEQ9SeUYvuYnpFz011mqSvski5T8claN02JN9ve2g",
+          passthrough: "Example 1",
+          stream_key: "abcdefgh",
+          url: "rtmp://live.example1.com/app"
+        }
       }
 
 
   """
-  @spec get_simulcast_target(%Tesla.Client{}, String.t(), String.t()) ::
-          %MuxWrapper.EmbeddedSchema.Simulcast{}
+  @spec get_simulcast_target(%Tesla.Client{}, String.t(), String.t()) :: tuple()
   def get_simulcast_target(client, live_stream_id, simulcast_target_id) do
     with {:ok, simulcast_target, _env} <-
            Mux.Video.LiveStreams.get_simulcast_target(client, live_stream_id, simulcast_target_id) do
@@ -484,9 +479,8 @@ defmodule MuxWrapper.LiveStreams do
       |> (&MuxWrapper.cast(&1, %Simulcast{})).()
     else
       {:error, reason, details} ->
-        MuxWrapper.print_errors(reason, details)
-
-        :error
+        reason
+        |> MuxWrapper.print_errors(details)
     end
   end
 
@@ -520,9 +514,9 @@ defmodule MuxWrapper.LiveStreams do
       } 
 
       iex> MuxWrapper.LiveStreams.delete_simulcast_target(client, "stream_id_very_long", "simulcast_target_id")
-      :ok    
+      {:ok}
   """
-  @spec delete_simulcast_target(%Tesla.Client{}, String.t(), String.t()) :: atom()
+  @spec delete_simulcast_target(%Tesla.Client{}, String.t(), String.t()) :: tuple()
   def delete_simulcast_target(client, live_stream_id, simulcast_target_id) do
     with {:ok, _, _env} <-
            Mux.Video.LiveStreams.delete_simulcast_target(
@@ -530,12 +524,11 @@ defmodule MuxWrapper.LiveStreams do
              live_stream_id,
              simulcast_target_id
            ) do
-      :ok
+      MuxWrapper.success()
     else
       {:error, reason, details} ->
-        MuxWrapper.print_errors(reason, details)
-
-        :error
+        reason
+        |> MuxWrapper.print_errors(details)
     end
   end
 
@@ -551,23 +544,26 @@ defmodule MuxWrapper.LiveStreams do
 
 
       iex> MuxWrapper.client() |> MuxWrapper.LiveStreams.reset_stream_key("stream_id_very_long")
-      %MuxWrapper.EmbeddedSchema.LiveStream{
-        created_at: ~N[2021-03-17 09:27:39],
-        id: "009cUTpAr01fQgGQdLHnoy62naafkNhYRGQGTqG6O54kE",
-        new_asset_settings: %{"playback_policies" => ["public"]},
-        playback_ids: [
-          %MuxWrapper.EmbeddedSchema.Playback{
-            id: "004iSQFtzMHEPnftHqeU8w6UMwUocP1i8nKXtKlHcjI8",
-            policy: "public"
-          }
-        ],
-        reconnect_window: 60,
-        status: "disabled",
-        stream_key: "d0c30be3-7e80-de52-5676-53a87a02c54f"
+      {:ok, 
+        %MuxWrapper.EmbeddedSchema.LiveStream{
+          created_at: ~N[2021-03-17 09:27:39],
+          id: "009cUTpAr01fQgGQdLHnoy62naafkNhYRGQGTqG6O54kE",
+          new_asset_settings: %{"playback_policies" => ["public"]},
+          playback_ids: [
+            %MuxWrapper.EmbeddedSchema.Playback{
+              id: "004iSQFtzMHEPnftHqeU8w6UMwUocP1i8nKXtKlHcjI8",
+              policy: "public"
+            }
+          ],
+          reconnect_window: 60,
+          status: "disabled",
+          stream_key: "d0c30be3-7e80-de52-5676-53a87a02c54f"
+        }
       }
 
+
   """
-  @spec reset_stream_key(%Tesla.Client{}, String.t()) :: %MuxWrapper.EmbeddedSchema.LiveStream{}
+  @spec reset_stream_key(%Tesla.Client{}, String.t()) :: tuple()
   def reset_stream_key(client, live_stream_id) do
     with {:ok, live_stream, _env} <-
            Mux.Video.LiveStreams.reset_stream_key(client, live_stream_id) do
@@ -575,9 +571,8 @@ defmodule MuxWrapper.LiveStreams do
       |> (&MuxWrapper.cast(&1, %LiveStream{})).()
     else
       {:error, reason, details} ->
-        MuxWrapper.print_errors(reason, details)
-
-        :error
+        reason
+        |> MuxWrapper.print_errors(details)
     end
   end
 end
