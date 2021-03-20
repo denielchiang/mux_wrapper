@@ -44,14 +44,16 @@ defmodule MuxWrapper.Playbacks do
       }
 
       iex> MuxWrapper.Playbacks.create_public_playback_id(client, "CO2pRYhPHeLzmv5MnmuRLmUSEYy4TvHj6gKcoU2kM7A")
-      %MuxWrapper.EmbeddedSchema.Playback{
-        id: "UdNWaprxjIA01BUYYDJpaCiDZQu22Ep6tAJLOLA8Sk7A",
-        policy: "public"
+      {:ok,
+        %MuxWrapper.EmbeddedSchema.Playback{
+          id: "UdNWaprxjIA01BUYYDJpaCiDZQu22Ep6tAJLOLA8Sk7A",
+          policy: "public"
+        }
       }
 
 
   """
-  @spec create_public_playback_id(%Tesla.Client{}, String.t()) :: playback
+  @spec create_public_playback_id(%Tesla.Client{}, String.t()) :: tuple()
   def(create_public_playback_id(client, asset_id),
     do: create_playback_id(client, asset_id, %{policy: @privacy.public})
   )
@@ -86,14 +88,16 @@ defmodule MuxWrapper.Playbacks do
       }
 
       iex> MuxWrapper.Playbacks.create_private_playback_id(client, "CO2pRYhPHeLzmv5MnmuRLmUSEYy4TvHj6gKcoU2kM7A")
-      %MuxWrapper.EmbeddedSchema.Playback{
-        id: "yP29YfRnmqr6Ft47nd9FscOTq5Eo63UWB74TJSeo9Es",
-        policy: "signed"
-      } 
+      {:ok,
+        %MuxWrapper.EmbeddedSchema.Playback{
+          id: "yP29YfRnmqr6Ft47nd9FscOTq5Eo63UWB74TJSeo9Es",
+          policy: "signed"
+        } 
+      }
 
 
   """
-  @spec create_private_playback_id(%Tesla.Client{}, String.t()) :: playback
+  @spec create_private_playback_id(%Tesla.Client{}, String.t()) :: tuple()
   def create_private_playback_id(client, asset_id),
     do: create_playback_id(client, asset_id, %{policy: @privacy.private})
 
