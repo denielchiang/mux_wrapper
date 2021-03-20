@@ -4,7 +4,7 @@ defmodule MuxWrapper.Assets do
   """
   require Logger
 
-  alias MuxWrapper.EmbeddedSchema.Asset
+  alias MuxWrapper.EmbeddedSchema.{Asset, AssetInfo}
 
   @doc """
   Provide create asset to Mux, suggest read [Mux doc](https://docs.mux.com/api-reference/video#operation/create-asset) first
@@ -178,6 +178,18 @@ defmodule MuxWrapper.Assets do
     with {:ok, asset, _env} <- Mux.Video.Assets.get(client, asset_id) do
       asset
       |> (&MuxWrapper.cast(&1, %Asset{})).()
+    else
+      {:error, reason, details} ->
+        MuxWrapper.print_errors(reason, details)
+
+        :error
+    end
+  end
+
+  def get_asset_input_info(client, asset_id) do
+    with {:ok, input_info, _env} <- Mux.Video.Assets.input_info(client, asset_id) do
+      input_info
+      |> (&MuxWrapper.cast(&1, %AssetInfo{})).()
     else
       {:error, reason, details} ->
         MuxWrapper.print_errors(reason, details)

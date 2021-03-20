@@ -3,7 +3,7 @@ defmodule MuxWrapper do
 
   require Logger
 
-  alias MuxWrapper.EmbeddedSchema.{Asset, LiveStream, Playback, Simulcast}
+  alias MuxWrapper.EmbeddedSchema.{Asset, AssetInfo, LiveStream, Playback, Simulcast}
 
   @doc """
   Provide a client via authentication
@@ -49,6 +49,7 @@ defmodule MuxWrapper do
     do: Enum.map(list, &cast(&1, struct))
 
   def cast(map, %Asset{} = struct), do: Asset.cast(struct, map)
+  def cast(map, %AssetInfo{} = struct), do: AssetInfo.cast(struct, map)
   def cast(map, %LiveStream{} = struct), do: LiveStream.cast(struct, map)
   def cast(map, %Playback{} = struct), do: Playback.cast(struct, map)
   def cast(map, %Simulcast{} = struct), do: Simulcast.cast(struct, map)

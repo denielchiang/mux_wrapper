@@ -26,7 +26,14 @@ defmodule MuxWrapper.EmbeddedSchema.Asset do
   end
 
   @doc false
-  @all_fields ~w(id mp4_support status master_access created_at)a
+  @all_fields ~w(id aspect_ratio duration master_access max_stored_frame_rate max_stored_resolution mp4_support status test created_at)a
+  def changeset(%__MODULE__{} = struct, params) do
+    struct
+    |> cast(params, @all_fields)
+    |> cast_embed(:tracks, with: &Track.changeset/2)
+    |> cast_embed(:playback_ids, with: &Playback.changeset/2)
+  end
+
   def cast(%__MODULE__{} = struct, params \\ %{}) do
     struct
     |> cast(params, @all_fields)
