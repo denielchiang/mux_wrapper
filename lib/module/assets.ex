@@ -504,4 +504,188 @@ defmodule MuxWrapper.Assets do
         :error
     end
   end
+
+  @mp4 %{
+    support: "standard",
+    unsupport: "none"
+  }
+  @doc """
+  Provide mp4 support(added) to Mux, suggest read [Mux doc](https://docs.mux.com/api-reference/video#operation/update-asset-mp4-support) first
+
+
+  ## Parameters
+
+  - client - provid by `MuxWrapper.client/0`
+  - asset_id - asset id
+
+  ## Examples
+
+
+      iex> client = MuxWrapper.client()
+      %Tesla.Client{
+        adapter: nil,
+        fun: nil,
+        post: [],
+        pre: [
+          {Tesla.Middleware.BaseUrl, :call, ["https://api.mux.com"]},
+          {Tesla.Middleware.BasicAuth, :call,
+           [
+             %{
+               password: "your_password",
+               username: "your_username"
+             }
+           ]}
+        ]
+      }
+
+      iex> MuxWrapper.Assets.set_mp4_support(client, "doS01p7VusXkwqfhe18LDttqIXV4xqXvd53K8ORee501k")
+      %MuxWrapper.EmbeddedSchema.Asset{
+        aspect_ratio: "16:9",
+        created_at: ~N[2021-03-19 14:37:50],
+        duration: 10,
+        id: "doS01p7VusXkwqfhe18LDttqIXV4xqXvd53K8ORee501k",
+        master_access: "temporary",
+        max_stored_frame_rate: 23.962,
+        max_stored_resolution: "SD",
+        mp4_support: "standard",
+        playback_ids: [],
+        status: "ready",
+        test: true,
+        tracks: [
+          %MuxWrapper.EmbeddedSchema.Track{
+            channels: nil,
+            duration: 60.095011,
+            encoding: nil,
+            frame_rate: nil,
+            height: nil,
+            id: "J00OusXFvcz9UJo93Vd5bFs1EsXX9cd1HqLs6lPWrRSA",
+            max_channel_layout: "stereo",
+            max_channels: 2,
+            max_frame_rate: nil,
+            max_height: nil,
+            max_width: nil,
+            sample_rate: nil,
+            type: "audio",
+            width: nil
+          },
+          %MuxWrapper.EmbeddedSchema.Track{
+            channels: nil,
+            duration: 60.095,
+            encoding: nil,
+            frame_rate: nil,
+            height: nil,
+            id: "2xI4b59vNk02DZ01EmtGk2bOYSb1vY4lmtmb6luBW500Tw",
+            max_channel_layout: nil,
+            max_channels: nil,
+            max_frame_rate: 23.962,
+            max_height: 360,
+            max_width: 640,
+            sample_rate: nil,
+            type: "video",
+            width: nil
+          }
+        ]
+      } 
+
+
+  """
+  @spec set_mp4_support(%Tesla.Client{}, String.t()) :: %MuxWrapper.EmbeddedSchema.Asset{}
+  def set_mp4_support(client, asset_id),
+    do: update_mp4_support(client, asset_id, %{mp4_support: @mp4.support})
+
+  @doc """
+  Provide mp4 not support(removed video) to Mux, suggest read [Mux doc](https://docs.mux.com/api-reference/video#operation/update-asset-mp4-support) first
+
+
+  ## Parameters
+
+  - client - provid by `MuxWrapper.client/0`
+  - asset_id - asset id
+
+  ## Examples
+
+
+      iex> client = MuxWrapper.client()
+      %Tesla.Client{
+        adapter: nil,
+        fun: nil,
+        post: [],
+        pre: [
+          {Tesla.Middleware.BaseUrl, :call, ["https://api.mux.com"]},
+          {Tesla.Middleware.BasicAuth, :call,
+           [
+             %{
+               password: "your_password",
+               username: "your_username"
+             }
+           ]}
+        ]
+      }
+
+      iex> MuxWrapper.Assets.set_mp4_unsupport(client, "doS01p7VusXkwqfhe18LDttqIXV4xqXvd53K8ORee501k")
+      %MuxWrapper.EmbeddedSchema.Asset{
+        aspect_ratio: "16:9",
+        created_at: ~N[2021-03-19 14:37:50],
+        duration: 10,
+        id: "doS01p7VusXkwqfhe18LDttqIXV4xqXvd53K8ORee501k",
+        master_access: "temporary",
+        max_stored_frame_rate: 23.962,
+        max_stored_resolution: "SD",
+        mp4_support: "none",
+        playback_ids: [],
+        status: "ready",
+        test: true,
+        tracks: [
+          %MuxWrapper.EmbeddedSchema.Track{
+            channels: nil,
+            duration: 60.095011,
+            encoding: nil,
+            frame_rate: nil,
+            height: nil,
+            id: "J00OusXFvcz9UJo93Vd5bFs1EsXX9cd1HqLs6lPWrRSA",
+            max_channel_layout: "stereo",
+            max_channels: 2,
+            max_frame_rate: nil,
+            max_height: nil,
+            max_width: nil,
+            sample_rate: nil,
+            type: "audio",
+            width: nil
+          },
+          %MuxWrapper.EmbeddedSchema.Track{
+            channels: nil,
+            duration: 60.095,
+            encoding: nil,
+            frame_rate: nil,
+            height: nil,
+            id: "2xI4b59vNk02DZ01EmtGk2bOYSb1vY4lmtmb6luBW500Tw",
+            max_channel_layout: nil,
+            max_channels: nil,
+            max_frame_rate: 23.962,
+            max_height: 360,
+            max_width: 640,
+            sample_rate: nil,
+            type: "video",
+            width: nil
+          }
+        ]
+      } 
+
+
+  """
+  @spec set_mp4_unsupport(%Tesla.Client{}, String.t()) :: %MuxWrapper.EmbeddedSchema.Asset{}
+  def set_mp4_unsupport(client, asset_id),
+    do: update_mp4_support(client, asset_id, %{mp4_support: @mp4.unsupport})
+
+  defp update_mp4_support(client, asset_id, params) do
+    with {:ok, asset, _env} <- Mux.Video.Assets.update_mp4_support(client, asset_id, params) do
+      asset
+      |> (&MuxWrapper.cast(&1, %Asset{})).()
+    else
+      {:error, reason, details} ->
+        MuxWrapper.print_errors(reason, details)
+
+        :error
+    end
+  end
 end
