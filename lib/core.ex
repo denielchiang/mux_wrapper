@@ -44,20 +44,24 @@ defmodule MuxWrapper do
         Application.get_env(:mux, :access_token_secret)
       )
 
-  @doc false
-  def cast(list, %LiveStream{} = struct) when is_list(list),
-    do: Enum.map(list, &cast(&1, struct))
+  def cast(list, %LiveStream{} = struct) when is_list(list) do
+    live_streams =
+      list
+      |> Enum.map(&cast(&1, struct))
 
-  def cast(map, %Asset{} = struct), do: Asset.cast(struct, map)
-  def cast(map, %AssetInfo{} = struct), do: AssetInfo.cast(struct, map)
-  def cast(map, %LiveStream{} = struct), do: LiveStream.cast(struct, map)
-  def cast(map, %Playback{} = struct), do: Playback.cast(struct, map)
-  def cast(map, %Simulcast{} = struct), do: Simulcast.cast(struct, map)
+    {:ok, live_streams}
+  end
+
+  def cast(map, %LiveStream{} = struct), do: {:ok, LiveStream.cast(struct, map)}
+  def cast(map, %Asset{} = struct), do: {:ok, Asset.cast(struct, map)}
+  def cast(map, %AssetInfo{} = struct), do: {:ok, AssetInfo.cast(struct, map)}
+  def cast(map, %Playback{} = struct), do: {:ok, Playback.cast(struct, map)}
+  def cast(map, %Simulcast{} = struct), do: {:ok, Simulcast.cast(struct, map)}
 
   @doc false
-  def cast_playback(playback_id), do: playback_id |> (&cast(&1, %Playback{})).()
+  def print_errors(reason, details) do
+    Logger.error("Mux pass in msg: " <> inspect(reason <> ": " <> List.first(details)))
 
-  @doc false
-  def print_errors(reason, details),
-    do: Logger.error("Mux pass in msg: " <> inspect(reason <> ": " <> List.first(details)))
+    {:error}
+  end
 end

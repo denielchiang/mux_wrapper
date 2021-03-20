@@ -3,8 +3,12 @@ defmodule MuxWrapper.LiveStreams do
   Provides a wrapper of live streaming to manipulate Mux API
   """
 
-  alias MuxWrapper
-  alias MuxWrapper.EmbeddedSchema.{LiveStream, Simulcast}
+  alias MuxWrapper.EmbeddedSchema.{LiveStream, Simulcast, Playback}
+
+  @typedoc """
+  A playback embedded schema, e.g. id, policy
+  """
+  @type playback :: MuxWrapper.EmbeddedSchema.Playback
 
   @playback_policy %{
     playback_policy: "public",
@@ -306,11 +310,11 @@ defmodule MuxWrapper.LiveStreams do
        }
 
   """
-  @spec create_playback_id(%Tesla.Client{}, String.t(), atom()) ::
-          %MuxWrapper.EmbeddedSchema.Playback{}
+  @spec create_playback_id(%Tesla.Client{}, String.t(), atom()) :: playback
   def create_playback_id(client, live_stream_id, params) do
     with {:ok, playback_id} <- create_playback(params, client, live_stream_id) do
-      MuxWrapper.cast_playback(playback_id)
+      playback_id
+      |> (&MuxWrapper.cast(&1, %Playback{})).()
     else
       {:error, reason, details} ->
         MuxWrapper.print_errors(reason, details)

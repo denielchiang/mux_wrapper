@@ -2,8 +2,6 @@ defmodule MuxWrapper.Assets do
   @moduledoc """
   Provides a wrapper of assets to manipulate Mux API
   """
-  require Logger
-
   alias MuxWrapper.EmbeddedSchema.{Asset, AssetInfo}
 
   @doc """
