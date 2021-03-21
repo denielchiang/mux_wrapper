@@ -16,12 +16,13 @@ defmodule MuxWrapper.EmbeddedSchema.LiveStream do
     field(:reconnect_window, :integer)
     field(:status, :string)
     field(:stream_key, :string)
+    field(:recent_asset_ids, {:array, :string})
     # The time at which the event was created. Time value is represented in ISO 8601 format.
     field(:created_at, UnixEpoch)
   end
 
   @doc false
-  @all_fields ~w(id new_asset_settings reconnect_window status stream_key created_at)a
+  @all_fields ~w(id new_asset_settings reconnect_window status stream_key created_at recent_asset_ids)a
   def changeset(%__MODULE__{} = struct, params) do
     struct
     |> cast(params, @all_fields)
