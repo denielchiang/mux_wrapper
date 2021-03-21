@@ -64,7 +64,7 @@ defmodule MuxWrapper.LiveStreams do
   ## Examples
 
 
-      iex> MuxWrapper.client() |> MuxWrapper.LiveStreams.get_live_stream("stream_id_very_long")
+      iex> MuxWrapper.client() |> MuxWrapper.LiveStreams.get("stream_id_very_long")
       {:ok,
         %MuxWrapper.EmbeddedSchema.LiveStream{
           created_at: ~N[2021-03-16 09:59:26],
@@ -83,8 +83,8 @@ defmodule MuxWrapper.LiveStreams do
       }
 
   """
-  @spec get_live_stream(%Tesla.Client{}, String.t()) :: tuple()
-  def get_live_stream(client, live_stream_id) do
+  @spec get(%Tesla.Client{}, String.t()) :: tuple()
+  def get(client, live_stream_id) do
     with {:ok, live_stream, _env} <- Mux.Video.LiveStreams.get(client, live_stream_id) do
       live_stream
       |> (&MuxWrapper.cast(&1, %LiveStream{})).()
@@ -200,7 +200,7 @@ defmodule MuxWrapper.LiveStreams do
   end
 
   @doc """
-  Provide a function to list all live streams in Mux, support pagnation see [Mux doc](https://docs.mux.com/api-reference/video#operation/list-live-streams)
+  Provide a function to list live streams by passing params in Mux, support pagnation see [Mux doc](https://docs.mux.com/api-reference/video#operation/list-live-streams)
 
    ## Parameters
 
@@ -227,7 +227,7 @@ defmodule MuxWrapper.LiveStreams do
         ]
        } 
 
-       iex> MuxWrapper.LiveStreams.list_live_streams(client, %{limit: 1, page: 1})
+       iex> MuxWrapper.LiveStreams.list(client, %{limit: 1, page: 1})
        {:ok, 
          [
           %MuxWrapper.EmbeddedSchema.LiveStream{
@@ -257,8 +257,8 @@ defmodule MuxWrapper.LiveStreams do
 
       
   """
-  @spec list_live_streams(%Tesla.Client{}, Enum.t()) :: tuple()
-  def list_live_streams(client, opt \\ %{}) do
+  @spec list(%Tesla.Client{}, Enum.t()) :: tuple()
+  def list(client, opt \\ %{}) do
     with {:ok, live_streams, _env} <- Mux.Video.LiveStreams.list(client, opt) do
       live_streams
       |> (&MuxWrapper.cast(&1, %LiveStream{})).()

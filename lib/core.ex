@@ -48,7 +48,7 @@ defmodule MuxWrapper do
   def cast(list, %LiveStream{} = struct) when is_list(list) do
     live_streams =
       list
-      |> Enum.map(&cast(&1, struct))
+      |> Enum.map(&LiveStream.cast(struct, &1))
 
     {:ok, live_streams}
   end
