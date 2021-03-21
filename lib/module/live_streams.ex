@@ -227,7 +227,7 @@ defmodule MuxWrapper.LiveStreams do
         ]
        } 
 
-       iex> MuxWrapper.LiveStreams.list_all_live_stream(client, %{limit: 1, page: 1})
+       iex> MuxWrapper.LiveStreams.list_live_streams(client, %{limit: 1, page: 1})
        {:ok, 
          [
           %MuxWrapper.EmbeddedSchema.LiveStream{
@@ -257,8 +257,8 @@ defmodule MuxWrapper.LiveStreams do
 
       
   """
-  @spec list_all_live_stream(%Tesla.Client{}, Enum.t()) :: tuple()
-  def list_all_live_stream(client, opt \\ %{}) do
+  @spec list_live_streams(%Tesla.Client{}, Enum.t()) :: tuple()
+  def list_live_streams(client, opt \\ %{}) do
     with {:ok, live_streams, _env} <- Mux.Video.LiveStreams.list(client, opt) do
       live_streams
       |> (&MuxWrapper.cast(&1, %LiveStream{})).()
