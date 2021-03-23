@@ -11,7 +11,7 @@ defmodule MuxWrapper.LiveStreams do
   }
 
   @doc """
-  Provide a function to send a create a live streming to Mux
+  Provide a function to send a create a public live streming to Mux
 
   ## Parameters
 
@@ -20,7 +20,7 @@ defmodule MuxWrapper.LiveStreams do
   ## Examples
 
 
-      iex> MuxWrapper.client() |> MuxWrapper.LiveStreams.create_live_stream()
+      iex> MuxWrapper.client() |> MuxWrapper.LiveStreams.create_public_live_stream()
       {:ok, 
         %MuxWrapper.EmbeddedSchema.LiveStream{
             created_at: ~N[2021-03-16 09:59:26],
@@ -40,10 +40,53 @@ defmodule MuxWrapper.LiveStreams do
 
 
   """
-  @spec create_live_stream(%Tesla.Client{}) :: tuple()
-  def create_live_stream(client) do
+  @spec create_public_live_stream(%Tesla.Client{}) :: tuple()
+  def create_public_live_stream(client) do
     with {:ok, live_stream, _teslaenv} <-
-           Mux.Video.LiveStreams.create(client, %{policy: @privacy.public}) do
+           Mux.Video.LiveStreams.create(client, LiveStream.public()) do
+      live_stream
+      |> (&MuxWrapper.cast(&1, %LiveStream{})).()
+    else
+      {:error, reason, details} ->
+        reason
+        |> MuxWrapper.print_errors(details)
+    end
+  end
+
+  @doc """
+  Provide a function to send a create a private live streming to Mux
+
+  ## Parameters
+
+    - client: provide by `MuxWrapper.client/0`
+
+  ## Examples
+
+
+      iex> MuxWrapper.client() |> MuxWrapper.LiveStreams.create_private_live_stream()
+      {:ok, 
+        %MuxWrapper.EmbeddedSchema.LiveStream{
+            created_at: ~N[2021-03-16 09:59:26],
+            id: "livestream_id_very_long",
+            new_asset_settings: %{"playback_policies" => ["public"]},
+            playback_ids: [
+              %MuxWrapper.EmbeddedSchema.Playback{
+                id: "playback_id_very_long",
+                policy: "singed"
+              }
+            ],
+            reconnect_window: 60,
+            status: "idle",
+            stream_key: "stream_key_very_long"
+          }
+      }
+
+
+  """
+  @spec create_private_live_stream(%Tesla.Client{}) :: tuple()
+  def create_private_live_stream(client) do
+    with {:ok, live_stream, _teslaenv} <-
+           Mux.Video.LiveStreams.create(client, LiveStream.private()) do
       live_stream
       |> (&MuxWrapper.cast(&1, %LiveStream{})).()
     else

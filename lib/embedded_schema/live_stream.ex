@@ -35,4 +35,17 @@ defmodule MuxWrapper.EmbeddedSchema.LiveStream do
     |> cast_embed(:playback_ids, with: &Playback.changeset/2)
     |> apply_changes
   end
+
+  @privacy %{
+    public: "public",
+    private: "signed"
+  }
+
+  def public do
+    %{playback_policy: @privacy.public, new_asset_settings: %{playback_policy: @privacy.public}}
+  end
+
+  def private do
+    %{playback_policy: @privacy.private, new_asset_settings: %{playback_policy: @privacy.private}}
+  end
 end
