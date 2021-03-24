@@ -2,7 +2,7 @@ defmodule MuxWrapper.LiveStreams do
   @moduledoc """
   Provides a wrapper of live streaming to manipulate Mux API
   """
-
+  alias Mux.Video.LiveStreams
   alias MuxWrapper.EmbeddedSchema.{LiveStream, Playback, Simulcast}
 
   @privacy %{
@@ -43,7 +43,7 @@ defmodule MuxWrapper.LiveStreams do
   @spec create_public_live_stream(%Tesla.Client{}) :: tuple()
   def create_public_live_stream(client) do
     with {:ok, live_stream, _teslaenv} <-
-           Mux.Video.LiveStreams.create(client, LiveStream.public()) do
+           LiveStreams.create(client, LiveStream.public()) do
       live_stream
       |> (&MuxWrapper.cast(&1, %LiveStream{})).()
     else
@@ -86,7 +86,7 @@ defmodule MuxWrapper.LiveStreams do
   @spec create_private_live_stream(%Tesla.Client{}) :: tuple()
   def create_private_live_stream(client) do
     with {:ok, live_stream, _teslaenv} <-
-           Mux.Video.LiveStreams.create(client, LiveStream.private()) do
+           LiveStreams.create(client, LiveStream.private()) do
       live_stream
       |> (&MuxWrapper.cast(&1, %LiveStream{})).()
     else
@@ -128,7 +128,7 @@ defmodule MuxWrapper.LiveStreams do
   """
   @spec get(%Tesla.Client{}, String.t()) :: tuple()
   def get(client, live_stream_id) do
-    with {:ok, live_stream, _env} <- Mux.Video.LiveStreams.get(client, live_stream_id) do
+    with {:ok, live_stream, _env} <- LiveStreams.get(client, live_stream_id) do
       live_stream
       |> (&MuxWrapper.cast(&1, %LiveStream{})).()
     else
@@ -154,7 +154,7 @@ defmodule MuxWrapper.LiveStreams do
   """
   @spec delete_live_stream(%Tesla.Client{}, String.t()) :: tuple()
   def delete_live_stream(client, live_stream_id) do
-    with {:ok, _data, _env} <- Mux.Video.LiveStreams.delete(client, live_stream_id) do
+    with {:ok, _data, _env} <- LiveStreams.delete(client, live_stream_id) do
       MuxWrapper.success()
     else
       {:error, reason, details} ->
@@ -179,7 +179,7 @@ defmodule MuxWrapper.LiveStreams do
   """
   @spec enable_live_stream(%Tesla.Client{}, String.t()) :: tuple()
   def enable_live_stream(client, live_stream_id) do
-    with {:ok, _, _env} <- Mux.Video.LiveStreams.enable(client, live_stream_id) do
+    with {:ok, _, _env} <- LiveStreams.enable(client, live_stream_id) do
       MuxWrapper.success()
     else
       {:error, reason, details} ->
@@ -206,7 +206,7 @@ defmodule MuxWrapper.LiveStreams do
   """
   @spec disable_live_stream(%Tesla.Client{}, String.t()) :: tuple()
   def disable_live_stream(client, live_stream_id) do
-    with {:ok, _, _env} <- Mux.Video.LiveStreams.disable(client, live_stream_id) do
+    with {:ok, _, _env} <- LiveStreams.disable(client, live_stream_id) do
       MuxWrapper.success()
     else
       {:error, reason, details} ->
@@ -233,7 +233,7 @@ defmodule MuxWrapper.LiveStreams do
   """
   @spec complete_live_stream(%Tesla.Client{}, String.t()) :: tuple()
   def complete_live_stream(client, live_stream_id) do
-    with {:ok, _, _env} <- Mux.Video.LiveStreams.signal_complete(client, live_stream_id) do
+    with {:ok, _, _env} <- LiveStreams.signal_complete(client, live_stream_id) do
       MuxWrapper.success()
     else
       {:error, reason, details} ->
@@ -302,7 +302,7 @@ defmodule MuxWrapper.LiveStreams do
   """
   @spec list(%Tesla.Client{}, Enum.t()) :: tuple()
   def list(client, opt \\ %{}) do
-    with {:ok, live_streams, _env} <- Mux.Video.LiveStreams.list(client, opt) do
+    with {:ok, live_streams, _env} <- LiveStreams.list(client, opt) do
       live_streams
       |> (&MuxWrapper.cast(&1, %LiveStream{})).()
     else
@@ -400,7 +400,7 @@ defmodule MuxWrapper.LiveStreams do
 
   defp create_playback_id(client, live_stream_id, params) do
     with {:ok, playback_id, _env} <-
-           Mux.Video.LiveStreams.create_playback_id(client, live_stream_id, params) do
+           LiveStreams.create_playback_id(client, live_stream_id, params) do
       playback_id
       |> (&MuxWrapper.cast(&1, %Playback{})).()
     else
@@ -445,7 +445,7 @@ defmodule MuxWrapper.LiveStreams do
   @spec delete_playback_id(%Tesla.Client{}, String.t(), String.t()) :: tuple()
   def delete_playback_id(client, live_stream_id, playback_id) do
     with {:ok, _, _env} <-
-           Mux.Video.LiveStreams.delete_playback_id(client, live_stream_id, playback_id) do
+           LiveStreams.delete_playback_id(client, live_stream_id, playback_id) do
       MuxWrapper.success()
     else
       {:error, reason, details} ->
@@ -492,7 +492,7 @@ defmodule MuxWrapper.LiveStreams do
         ) :: tuple()
   def create_simulcast_target(client, live_stream_id, params) do
     with {:ok, simulcast_target, _env} <-
-           Mux.Video.LiveStreams.create_simulcast_target(client, live_stream_id, params) do
+           LiveStreams.create_simulcast_target(client, live_stream_id, params) do
       simulcast_target
       |> (&MuxWrapper.cast(&1, %Simulcast{})).()
     else
@@ -503,7 +503,7 @@ defmodule MuxWrapper.LiveStreams do
   end
 
   @doc """
-  Provide a function to get simulcast target, strongly suggest read [Mux doc](https://hexdocs.pm/mux/Mux.Video.LiveStreams.html#get_simulcast_target/3) first
+  Provide a function to get simulcast target, strongly suggest read [Mux doc](https://hexdocs.pm/mux/LiveStreams.html#get_simulcast_target/3) first
 
   ## Parameters
 
@@ -546,7 +546,7 @@ defmodule MuxWrapper.LiveStreams do
   @spec get_simulcast_target(%Tesla.Client{}, String.t(), String.t()) :: tuple()
   def get_simulcast_target(client, live_stream_id, simulcast_target_id) do
     with {:ok, simulcast_target, _env} <-
-           Mux.Video.LiveStreams.get_simulcast_target(client, live_stream_id, simulcast_target_id) do
+           LiveStreams.get_simulcast_target(client, live_stream_id, simulcast_target_id) do
       simulcast_target
       |> (&MuxWrapper.cast(&1, %Simulcast{})).()
     else
@@ -591,7 +591,7 @@ defmodule MuxWrapper.LiveStreams do
   @spec delete_simulcast_target(%Tesla.Client{}, String.t(), String.t()) :: tuple()
   def delete_simulcast_target(client, live_stream_id, simulcast_target_id) do
     with {:ok, _, _env} <-
-           Mux.Video.LiveStreams.delete_simulcast_target(
+           LiveStreams.delete_simulcast_target(
              client,
              live_stream_id,
              simulcast_target_id
@@ -638,7 +638,7 @@ defmodule MuxWrapper.LiveStreams do
   @spec reset_stream_key(%Tesla.Client{}, String.t()) :: tuple()
   def reset_stream_key(client, live_stream_id) do
     with {:ok, live_stream, _env} <-
-           Mux.Video.LiveStreams.reset_stream_key(client, live_stream_id) do
+           LiveStreams.reset_stream_key(client, live_stream_id) do
       live_stream
       |> (&MuxWrapper.cast(&1, %LiveStream{})).()
     else
