@@ -3,7 +3,7 @@ defmodule MuxWrapper.LiveStreams do
   Provides a wrapper of live streaming to manipulate Mux API
   """
 
-  alias MuxWrapper.EmbeddedSchema.{LiveStream, Simulcast, Playback}
+  alias MuxWrapper.EmbeddedSchema.{LiveStream, Playback, Simulcast}
 
   @privacy %{
     public: "public",
