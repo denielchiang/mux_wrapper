@@ -3,6 +3,7 @@ defmodule MuxWrapper.Assets do
   Provides a wrapper of assets to manipulate Mux API
   """
   alias MuxWrapper.EmbeddedSchema.{Asset, AssetInfo}
+  alias Mux.Video.Assets
 
   @doc """
   Provide create asset to Mux, suggest read [Mux doc](https://docs.mux.com/api-reference/video#operation/create-asset) first
@@ -50,7 +51,7 @@ defmodule MuxWrapper.Assets do
   """
   @spec create_asset(%Tesla.Client{}, Enum.t()) :: tuple()
   def create_asset(client, params) do
-    with {:ok, asset, _env} <- Mux.Video.Assets.create(client, params) do
+    with {:ok, asset, _env} <- Assets.create(client, params) do
       asset
       |> (&MuxWrapper.cast(&1, %Asset{})).()
     else
@@ -96,7 +97,7 @@ defmodule MuxWrapper.Assets do
   """
   @spec delete_asset(%Tesla.Client{}, String.t()) :: tuple()
   def delete_asset(client, asset_id) do
-    with {:ok, "", _env} <- Mux.Video.Assets.delete(client, asset_id) do
+    with {:ok, "", _env} <- Assets.delete(client, asset_id) do
       MuxWrapper.success()
     else
       {:error, reason, details} ->
@@ -177,7 +178,7 @@ defmodule MuxWrapper.Assets do
   """
   @spec get_asset(%Tesla.Client{}, String.t()) :: tuple()
   def get_asset(client, asset_id) do
-    with {:ok, asset, _env} <- Mux.Video.Assets.get(client, asset_id) do
+    with {:ok, asset, _env} <- Assets.get(client, asset_id) do
       asset
       |> (&MuxWrapper.cast(&1, %Asset{})).()
     else
@@ -302,7 +303,7 @@ defmodule MuxWrapper.Assets do
   """
   @spec get_asset_input_info(%Tesla.Client{}, String.t()) :: tuple()
   def get_asset_input_info(client, asset_id) do
-    with {:ok, input_info, _env} <- Mux.Video.Assets.input_info(client, asset_id) do
+    with {:ok, input_info, _env} <- Assets.input_info(client, asset_id) do
       input_info
       |> (&MuxWrapper.cast(&1, %AssetInfo{})).()
     else
@@ -398,7 +399,7 @@ defmodule MuxWrapper.Assets do
   """
   @spec list_assets(%Tesla.Client{}, Enum.t()) :: tuple()
   def list_assets(client, opt \\ %{}) do
-    with {:ok, assets, _env} <- Mux.Video.Assets.list(client, opt) do
+    with {:ok, assets, _env} <- Assets.list(client, opt) do
       assets
       |> (&MuxWrapper.cast(&1, %Asset{})).()
     else
@@ -496,7 +497,7 @@ defmodule MuxWrapper.Assets do
   @spec update_master_access(%Tesla.Client{}, String.t()) :: tuple()
   def update_master_access(client, asset_id) do
     with {:ok, asset, _env} <-
-           Mux.Video.Assets.update_master_access(client, asset_id, @master_access) do
+           Assets.update_master_access(client, asset_id, @master_access) do
       asset
       |> (&MuxWrapper.cast(&1, %Asset{})).()
     else
@@ -683,7 +684,7 @@ defmodule MuxWrapper.Assets do
     do: update_mp4_support(client, asset_id, %{mp4_support: @mp4.unsupport})
 
   defp update_mp4_support(client, asset_id, params) do
-    with {:ok, asset, _env} <- Mux.Video.Assets.update_mp4_support(client, asset_id, params) do
+    with {:ok, asset, _env} <- Assets.update_mp4_support(client, asset_id, params) do
       asset
       |> (&MuxWrapper.cast(&1, %Asset{})).()
     else

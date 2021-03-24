@@ -32,7 +32,10 @@ defmodule MuxWrapper.MixProject do
   end
 
   defp aliases do
-    [c: "compile"]
+    [
+      c: "compile",
+      "check.linter": ["credo --strict"]
+    ]
   end
 
   # Run "mix help compile.app" to learn about applications.
@@ -50,7 +53,15 @@ defmodule MuxWrapper.MixProject do
       {:ex_doc, "~> 0.24", only: :dev, runtime: false},
 
       # Mux
-      {:mux, "~> 1.9.0"}
+      {:mux, "~> 1.9.0"},
+
+      # Linting
+      {:credo, "~> 1.5", only: [:dev, :test], override: true},
+      {:credo_envvar, "~> 0.1.4", only: [:dev, :test], runtime: false},
+      {:credo_naming, "~> 1.0", only: [:dev, :test], runtime: false},
+
+      # Test coverage
+      {:excoveralls, "~> 0.13.4"}
     ]
   end
 end
