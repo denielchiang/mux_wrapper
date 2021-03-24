@@ -100,10 +100,11 @@ defmodule MuxWrapper.Playbacks do
     do: create_playback_id(client, asset_id, %{policy: @privacy.private})
 
   defp create_playback_id(client, asset_id, params) do
-    with {:ok, playback_id, _env} <- PlaybackIds.create(client, asset_id, params) do
-      playback_id
-      |> (&MuxWrapper.cast(&1, %Playback{})).()
-    else
+    case PlaybackIds.create(client, asset_id, params) do
+      {:ok, playback_id, _env} ->
+        playback_id
+        |> (&MuxWrapper.cast(&1, %Playback{})).()
+
       {:error, reason, details} ->
         reason
         |> MuxWrapper.print_errors(details)
@@ -149,9 +150,10 @@ defmodule MuxWrapper.Playbacks do
   """
   @spec delete(%Tesla.Client{}, String.t(), String.t()) :: tuple()
   def delete(client, asset_id, playback_id) do
-    with {:ok, "", _env} <- PlaybackIds.delete(client, asset_id, playback_id) do
-      MuxWrapper.success()
-    else
+    case PlaybackIds.delete(client, asset_id, playback_id) do
+      {:ok, "", _env} ->
+        MuxWrapper.success()
+
       {:error, reason, details} ->
         reason
         |> MuxWrapper.print_errors(details)
@@ -203,10 +205,11 @@ defmodule MuxWrapper.Playbacks do
   """
   @spec get(%Tesla.Client{}, String.t(), String.t()) :: tuple()
   def get(client, asset_id, playback_id) do
-    with {:ok, playback_id, _env} <- PlaybackIds.get(client, asset_id, playback_id) do
-      playback_id
-      |> (&MuxWrapper.cast(&1, %Playback{})).()
-    else
+    case PlaybackIds.get(client, asset_id, playback_id) do
+      {:ok, playback_id, _env} ->
+        playback_id
+        |> (&MuxWrapper.cast(&1, %Playback{})).()
+
       {:error, reason, details} ->
         reason
         |> MuxWrapper.print_errors(details)
