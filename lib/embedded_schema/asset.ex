@@ -5,7 +5,7 @@ defmodule MuxWrapper.EmbeddedSchema.Asset do
 
   import Ecto.Changeset
 
-  alias MuxWrapper.EmbeddedSchema.{Track, Playback}
+  alias MuxWrapper.EmbeddedSchema.{Playback, Track}
   alias MuxWrapper.Type.UnixEpoch
 
   @primary_key false
@@ -26,7 +26,10 @@ defmodule MuxWrapper.EmbeddedSchema.Asset do
   end
 
   @doc false
-  @all_fields ~w(id aspect_ratio duration master_access max_stored_frame_rate max_stored_resolution mp4_support status test created_at)a
+  @all_fields ~w(
+    id aspect_ratio duration master_access max_stored_frame_rate
+    max_stored_resolution mp4_support status test created_at
+  )a
   def changeset(%__MODULE__{} = struct, params) do
     struct
     |> cast(params, @all_fields)
