@@ -2,8 +2,8 @@ defmodule MuxWrapper.Assets do
   @moduledoc """
   Provides a wrapper of assets to manipulate Mux API
   """
-  alias MuxWrapper.EmbeddedSchema.{Asset, AssetInfo}
   alias Mux.Video.Assets
+  alias MuxWrapper.EmbeddedSchema.{Asset, AssetInfo}
 
   @doc """
   Provide create asset to Mux, suggest read [Mux doc](https://docs.mux.com/api-reference/video#operation/create-asset) first
@@ -51,10 +51,11 @@ defmodule MuxWrapper.Assets do
   """
   @spec create_asset(%Tesla.Client{}, Enum.t()) :: tuple()
   def create_asset(client, params) do
-    with {:ok, asset, _env} <- Assets.create(client, params) do
-      asset
-      |> (&MuxWrapper.cast(&1, %Asset{})).()
-    else
+    case Assets.create(client, params) do
+      {:ok, asset, _env} ->
+        asset
+        |> (&MuxWrapper.cast(&1, %Asset{})).()
+
       {:error, reason, details} ->
         reason
         |> MuxWrapper.print_errors(details)
@@ -97,9 +98,10 @@ defmodule MuxWrapper.Assets do
   """
   @spec delete_asset(%Tesla.Client{}, String.t()) :: tuple()
   def delete_asset(client, asset_id) do
-    with {:ok, "", _env} <- Assets.delete(client, asset_id) do
-      MuxWrapper.success()
-    else
+    case Assets.delete(client, asset_id) do
+      {:ok, "", _env} ->
+        MuxWrapper.success()
+
       {:error, reason, details} ->
         reason
         |> MuxWrapper.print_errors(details)
@@ -178,10 +180,11 @@ defmodule MuxWrapper.Assets do
   """
   @spec get_asset(%Tesla.Client{}, String.t()) :: tuple()
   def get_asset(client, asset_id) do
-    with {:ok, asset, _env} <- Assets.get(client, asset_id) do
-      asset
-      |> (&MuxWrapper.cast(&1, %Asset{})).()
-    else
+    case Assets.get(client, asset_id) do
+      {:ok, asset, _env} ->
+        asset
+        |> (&MuxWrapper.cast(&1, %Asset{})).()
+
       {:error, reason, details} ->
         reason
         |> MuxWrapper.print_errors(details)
@@ -303,10 +306,11 @@ defmodule MuxWrapper.Assets do
   """
   @spec get_asset_input_info(%Tesla.Client{}, String.t()) :: tuple()
   def get_asset_input_info(client, asset_id) do
-    with {:ok, input_info, _env} <- Assets.input_info(client, asset_id) do
-      input_info
-      |> (&MuxWrapper.cast(&1, %AssetInfo{})).()
-    else
+    case Assets.input_info(client, asset_id) do
+      {:ok, input_info, _env} ->
+        input_info
+        |> (&MuxWrapper.cast(&1, %AssetInfo{})).()
+
       {:error, reason, details} ->
         reason
         |> MuxWrapper.print_errors(details)
@@ -399,10 +403,11 @@ defmodule MuxWrapper.Assets do
   """
   @spec list_assets(%Tesla.Client{}, Enum.t()) :: tuple()
   def list_assets(client, opt \\ %{}) do
-    with {:ok, assets, _env} <- Assets.list(client, opt) do
-      assets
-      |> (&MuxWrapper.cast(&1, %Asset{})).()
-    else
+    case Assets.list(client, opt) do
+      {:ok, assets, _env} ->
+        assets
+        |> (&MuxWrapper.cast(&1, %Asset{})).()
+
       {:error, reason, details} ->
         reason
         |> MuxWrapper.print_errors(details)
@@ -496,11 +501,11 @@ defmodule MuxWrapper.Assets do
   }
   @spec update_master_access(%Tesla.Client{}, String.t()) :: tuple()
   def update_master_access(client, asset_id) do
-    with {:ok, asset, _env} <-
-           Assets.update_master_access(client, asset_id, @master_access) do
-      asset
-      |> (&MuxWrapper.cast(&1, %Asset{})).()
-    else
+    case Assets.update_master_access(client, asset_id, @master_access) do
+      {:ok, asset, _env} ->
+        asset
+        |> (&MuxWrapper.cast(&1, %Asset{})).()
+
       {:error, reason, details} ->
         reason
         |> MuxWrapper.print_errors(details)
@@ -684,10 +689,11 @@ defmodule MuxWrapper.Assets do
     do: update_mp4_support(client, asset_id, %{mp4_support: @mp4.unsupport})
 
   defp update_mp4_support(client, asset_id, params) do
-    with {:ok, asset, _env} <- Assets.update_mp4_support(client, asset_id, params) do
-      asset
-      |> (&MuxWrapper.cast(&1, %Asset{})).()
-    else
+    case Assets.update_mp4_support(client, asset_id, params) do
+      {:ok, asset, _env} ->
+        asset
+        |> (&MuxWrapper.cast(&1, %Asset{})).()
+
       {:error, reason, details} ->
         MuxWrapper.print_errors(reason, details)
 
