@@ -1,7 +1,10 @@
 defmodule MuxWrapper.Playbacks do
   @moduledoc """
   Provides a wrapper of playback ids to manipulate Mux API
+
   """
+
+  alias Mux.Video.PlaybackIds
   alias MuxWrapper.EmbeddedSchema.Playback
 
   @privacy %{
@@ -97,7 +100,7 @@ defmodule MuxWrapper.Playbacks do
     do: create_playback_id(client, asset_id, %{policy: @privacy.private})
 
   defp create_playback_id(client, asset_id, params) do
-    with {:ok, playback_id, _env} <- Mux.Video.PlaybackIds.create(client, asset_id, params) do
+    with {:ok, playback_id, _env} <- PlaybackIds.create(client, asset_id, params) do
       playback_id
       |> (&MuxWrapper.cast(&1, %Playback{})).()
     else
@@ -146,7 +149,7 @@ defmodule MuxWrapper.Playbacks do
   """
   @spec delete(%Tesla.Client{}, String.t(), String.t()) :: tuple()
   def delete(client, asset_id, playback_id) do
-    with {:ok, "", _env} <- Mux.Video.PlaybackIds.delete(client, asset_id, playback_id) do
+    with {:ok, "", _env} <- PlaybackIds.delete(client, asset_id, playback_id) do
       MuxWrapper.success()
     else
       {:error, reason, details} ->
@@ -200,7 +203,7 @@ defmodule MuxWrapper.Playbacks do
   """
   @spec get(%Tesla.Client{}, String.t(), String.t()) :: tuple()
   def get(client, asset_id, playback_id) do
-    with {:ok, playback_id, _env} <- Mux.Video.PlaybackIds.get(client, asset_id, playback_id) do
+    with {:ok, playback_id, _env} <- PlaybackIds.get(client, asset_id, playback_id) do
       playback_id
       |> (&MuxWrapper.cast(&1, %Playback{})).()
     else
